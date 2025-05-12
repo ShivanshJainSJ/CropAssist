@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fertility Analysis - CROPASSIST</title>
+  <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in-up {
+      animation: fadeInUp 0.8s ease-out forwards;
+    }
+    .glow {
+      box-shadow: 0 0 15px rgba(255, 193, 7, 0.4);
+    }
+    .floating {
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    .input-focus:focus {
+      border-color: #ffc107;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-yellow-100 via-green-50 to-blue-50 min-h-screen py-10">
+  <div class="container mx-auto px-4">
+    
+    <!-- Header with Logo -->
+    <div class="flex justify-center mb-8">
+      <div class="flex items-center space-x-3">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="CROPASSIST Logo" class="w-14 h-14" />
+        <h1 class="text-3xl font-bold text-green-800">CROPASSIST - Fertility Analysis</h1>
+      </div>
+    </div>
+    
+    <div class="max-w-4xl mx-auto">
+      <div class="bg-white rounded-2xl shadow-xl overflow-hidden fade-in-up">
+        <div class="flex flex-col md:flex-row">
+          <!-- Form Section -->
+          <div class="p-8 md:w-1/2 bg-gradient-to-br from-yellow-50 to-green-50">
+            <h2 class="text-2xl font-bold text-green-800 mb-6">🌱 Soil Nutrient Analysis</h2>
+            
+            <!-- Flash messages -->
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+              <div class="mb-6 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 rounded fade-in-up">
+                {% for message in messages %}
+                  <p>{{ message }}</p>
+                {% endfor %}
+              </div>
+            {% endif %}
+            {% endwith %}
+            
+            <form action="/fertility" method="POST" class="space-y-6">
+              <div>
+                <label class="block text-lg font-semibold text-gray-800">🌾 Nitrogen</label>
+                <input type="number" name="nitrogen" placeholder="e.g. 50" min="1" required
+                       class="w-full mt-2 p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-yellow-400 focus:outline-none transition input-focus"/>
+              </div>
+              
+              <div>
+                <label class="block text-lg font-semibold text-gray-800">🌱 Phosphorous</label>
+                <input type="number" name="phosphorous" placeholder="e.g. 30" min="1" required
+                       class="w-full mt-2 p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-yellow-400 focus:outline-none transition input-focus"/>
+              </div>
+              
+              <div>
+                <label class="block text-lg font-semibold text-gray-800">🍃 Potassium</label>
+                <input type="number" name="pottasium" placeholder="e.g. 40" min="1" required
+                       class="w-full mt-2 p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-yellow-400 focus:outline-none transition input-focus"/>
+              </div>
+              
+              <button type="submit" class="w-full py-3 bg-yellow-500 hover:bg-yellow-600 text-white font-bold rounded-xl transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 glow">
+                Analyze Soil Fertility
+              </button>
+            </form>
+          </div>
+          
+          <!-- Results Section -->
+          <div class="p-8 md:w-1/2 bg-gradient-to-br from-green-50 to-blue-50">
+            <h2 class="text-2xl font-bold text-green-800 mb-6">📊 Fertility Results</h2>
+            
+            {% if data %}
+            <div class="space-y-6 fade-in-up">
+              <div class="bg-white p-6 rounded-xl shadow-md">
+                <h3 class="text-xl font-semibold text-green-700 mb-3">Recommended Fertilizer</h3>
+                <p class="text-lg font-medium text-yellow-600">{{ data.fertilizer }}</p>
+              </div>
+              
+              <div class="bg-white p-6 rounded-xl shadow-md">
+                <h3 class="text-xl font-semibold text-green-700 mb-3">Fertilizer Composition</h3>
+                <p class="text-gray-700">{{ data.composition }}</p>
+              </div>
+              
+              <div class="bg-white p-6 rounded-xl shadow-md">
+                <h3 class="text-xl font-semibold text-green-700 mb-3">How to Apply</h3>
+                <ul class="list-disc list-inside space-y-2 text-gray-700">
+                  <li>Apply directly to soil before planting</li>
+                  <li>Mix thoroughly into the top 3-4 inches of soil</li>
+                  <li>Water thoroughly after application</li>
+                </ul>
+              </div>
+            </div>
+            {% else %}
+            <div class="h-full flex items-center justify-center">
+              <div class="text-center p-6 bg-gray-50 rounded-xl border border-gray-200 w-full">
+                <img src="https://cdn-icons-png.flaticon.com/512/4039/4039232.png" class="w-32 h-32 mx-auto mb-4 floating" alt="Soil analysis">
+                <p class="text-gray-600">Enter your soil nutrients data to get fertilizer recommendations</p>
+              </div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      
+      <!-- Additional Tips Section -->
+      <div class="mt-10 bg-white rounded-2xl shadow-lg p-8 fade-in-up">
+        <h2 class="text-2xl font-bold text-green-800 mb-6">🌿 Soil Health Tips</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-green-50 p-6 rounded-xl border border-green-200 hover:shadow-md transition duration-300">
+            <h3 class="text-lg font-semibold text-green-700 mb-2">Crop Rotation</h3>
+            <p class="text-gray-700">Rotate crops to prevent soil nutrient depletion and reduce pest problems.</p>
+          </div>
+          
+          <div class="bg-yellow-50 p-6 rounded-xl border border-yellow-200 hover:shadow-md transition duration-300">
+            <h3 class="text-lg font-semibold text-yellow-700 mb-2">Organic Matter</h3>
+            <p class="text-gray-700">Add compost to improve soil structure, water retention and biological activity.</p>
+          </div>
+          
+          <div class="bg-blue-50 p-6 rounded-xl border border-blue-200 hover:shadow-md transition duration-300">
+            <h3 class="text-lg font-semibold text-blue-700 mb-2">Soil Testing</h3>
+            <p class="text-gray-700">Test soil regularly to monitor nutrient levels and pH for optimal plant growth.</p>
+          </div>
+          
+          <div class="bg-purple-50 p-6 rounded-xl border border-purple-200 hover:shadow-md transition duration-300">
+            <h3 class="text-lg font-semibold text-purple-700 mb-2">Cover Crops</h3>
+            <p class="text-gray-700">Plant cover crops to prevent erosion, suppress weeds, and add organic matter.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="mt-16 text-center text-gray-600">
+      <p>&copy; 2025 CROPASSIST. All rights reserved.</p>
+    </footer>
+  </div>
+</body>
+</html>

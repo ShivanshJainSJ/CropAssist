@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Disease Detection - CROPASSIST</title>
+  <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Custom animation for button hover */
+    @keyframes fadeIn {
+      0% {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .fade-in {
+      animation: fadeIn 1s ease-out;
+    }
+
+    /* Hover effects for buttons and input fields */
+    .hover-scale:hover {
+      transform: scale(1.05);
+    }
+
+    .focus-ring:focus {
+      box-shadow: 0 0 0 3px rgba(248, 113, 54, 0.7);
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-to-br from-green-100 via-yellow-50 to-green-200 text-gray-900">
+
+  <!-- Navbar -->  <nav class="bg-white shadow-lg py-4">
+    <div class="container mx-auto flex justify-between items-center px-4">
+      <div class="flex items-center space-x-3">
+        <img src="https://cdn-icons-png.flaticon.com/512/2913/2913461.png" alt="logo" class="w-12 h-12" />
+        <h1 class="text-3xl font-bold text-red-700">CropAssist Solution</h1>
+      </div>
+      <div class="flex space-x-4">
+        <a href="{{ url_for('disease_history') }}" class="text-green-700 hover:underline text-sm font-medium">View Detection History</a>
+        <a href="{{ url_for('home') }}" class="text-red-700 hover:underline text-sm font-medium">← Back to Home</a>
+      </div>
+  </div>
+  </nav>
+
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <div class="container mx-auto mt-4">
+        {% for message in messages %}
+          <div class="flash-message p-4 mb-4 rounded-lg {% if '✅' in message %}bg-green-100 text-green-800 border border-green-300{% else %}bg-red-100 text-red-800 border border-red-300{% endif %} transition-opacity duration-1000">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+  <!-- Disease Detection Section -->
+  <section id="disease-detection" class="bg-white py-20 px-4 text-center fade-in">
+    <h2 class="text-4xl font-bold text-red-700 mb-6 animate__animated animate__fadeIn animate__delay-1s">🌿 Disease Detection</h2>
+    <p class="text-xl text-gray-700 mb-6">Upload an image of your plant to detect diseases early and get recommendations for treatment.</p>
+
+    {% if prediction_result %}
+    <!-- Prediction Results -->
+    <div class="max-w-2xl mx-auto bg-gray-50 p-8 rounded-xl shadow-lg mb-10">
+      <div class="flex flex-col md:flex-row">
+        <div class="md:w-1/2 mb-6 md:mb-0 md:pr-4">
+          <img src="data:image/jpeg;base64,{{ image }}" alt="Uploaded plant image" class="rounded-lg shadow-md w-full h-auto">
+        </div>
+        <div class="md:w-1/2 text-left md:pl-4">
+          <h3 class="text-2xl font-bold mb-2 {% if 'healthy' in disease %}text-green-700{% else %}text-red-700{% endif %}">
+            {{ disease.replace('___', ' - ').replace('_', ' ') }}
+          </h3>
+          <p class="mb-4 text-gray-600">Confidence: {{ "%.2f"|format(confidence) }}%</p>
+          <div class="bg-gray-100 p-4 rounded-lg">
+            <h4 class="font-bold text-gray-800 mb-2">Treatment Recommendation:</h4>
+            <p class="text-gray-700">{{ treatment }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="mt-6">
+        <a href="{{ url_for('diseases') }}" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition duration-300">
+          Analyze Another Image
+        </a>
+      </div>
+    </div>
+    {% else %}
+    <!-- Disease Detection Form -->
+    <form action="{{ url_for('detect_disease') }}" method="POST" enctype="multipart/form-data" class="max-w-lg mx-auto bg-gray-50 p-8 rounded-xl shadow-lg hover:shadow-xl transition duration-300 ease-in-out hover-scale">
+      <label for="image-input" class="block text-lg font-semibold text-gray-800 mb-4">Upload Plant Image</label>
+      <input type="file" id="image-input" name="image" accept="image/*" required
+        class="w-full p-4 border border-gray-300 rounded-lg mb-6 focus:ring-2 focus:ring-red-400 focus:ring-opacity-50 transition duration-300 ease-in-out"/>
+
+      <button type="submit"
+        class="bg-red-600 text-white px-6 py-3 rounded-lg w-full hover:bg-red-700 transition duration-300 ease-in-out hover-scale">
+        Detect Disease
+      </button>
+    </form>
+    {% endif %}
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-white text-center py-6 mt-10">
+    <p class="text-lg">&copy; 2025 CropAssist Solution. All rights reserved.</p>
+  </footer>
+  <script>
+    // Add flash messages auto-hide functionality
+    setTimeout(function() {
+      const flashMessages = document.querySelectorAll('.flash-message');
+      flashMessages.forEach(message => {
+        message.style.opacity = '0';
+        setTimeout(() => message.remove(), 1000);
+      });
+    }, 5000);
+  </script>
+
+</body>
+
+</html>

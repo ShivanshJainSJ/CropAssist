@@ -1,0 +1,19 @@
+# Core web framework
+Flask==2.0.1
+
+# Database
+pymongo==4.3.3
+dnspython==2.3.0  # For MongoDB connection string support
+
+# Data processing and scientific computing
+numpy==1.24.3
+pandas==2.0.1
+scipy==1.10.1
+
+# Machine Learning
+tensorflow==2.12.0
+Pillow==9.5.0  # For PIL/Image processing
+
+# Other utilities
+python-dotenv==1.0.0  # For environment variables management
+gunicorn==20.1.0  # For production deployment

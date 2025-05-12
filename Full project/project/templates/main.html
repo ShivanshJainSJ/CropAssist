@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CROPASSIST</title>
+  <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html { scroll-behavior: smooth; }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes bounceEmoji {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px) rotate(5deg); }
+    }
+    @keyframes slideUp {
+      0% { transform: translateY(100%); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+    .fade-in { animation: fadeInUp 0.8s ease-out; }
+    .emoji-animated { display: inline-block; animation: bounceEmoji 2s infinite; transition: transform 0.3s ease; }
+    .emoji-animated:hover { transform: scale(1.2) rotate(10deg); }
+    .btn { transition: all 0.3s ease; }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); }
+    .card { transition: all 0.3s ease; }
+    .card:hover { transform: scale(1.03); }
+    #thankYouPopup {
+      animation: slideUp 0.6s ease forwards;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+  <!-- Language Selection Modal -->
+<div id="languageModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white rounded-lg p-8 max-w-sm w-full text-center shadow-xl">
+    <h2 class="text-2xl font-bold text-green-700 mb-4">🌐 Choose Language</h2>
+    <p class="text-gray-700 mb-6">Please select your preferred language:</p>
+    <div class="flex justify-center gap-4">
+      <button onclick="selectLanguage('english')" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">🇬🇧 English</button>
+      <button onclick="selectLanguage('hindi')" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">🇮🇳 हिंदी</button>
+    </div>
+  </div>
+</div>
+  <!-- Navbar -->
+  <nav class="bg-white shadow py-4 sticky top-0 z-50">
+    <div class="container mx-auto flex justify-between items-center px-6">
+      <div class="flex items-center space-x-3">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="CROPASSIST Logo" class="w-12 h-12" />
+        <h1 class="text-2xl font-bold text-green-700">🌾 CropAssist Solution</h1>
+      </div>      <ul class="flex gap-6 text-gray-600 font-medium">
+        <li><a href="#home" class="hover:text-green-600">Home</a></li>
+        <li><a href="#about" class="hover:text-green-600">About</a></li>
+        <li><a href="#services" class="hover:text-green-600">Services</a></li>
+        {% if logged_in %}
+        <li><a href="{{ url_for('diseases') }}" class="hover:text-green-600">Disease Detection</a></li>
+        <li><a href="{{ url_for('disease_history') }}" class="hover:text-green-600">Detection History</a></li>
+        {% endif %}
+        <li><a href="#feedback" class="hover:text-green-600">Feedback</a></li>
+      </ul>
+      <div class="relative">
+        <button onclick="toggleAccountMenu()" class="text-2xl cursor-pointer hover:text-green-700 focus:outline-none">👤</button>        <div id="accountMenu" class="absolute right-0 mt-2 w-40 bg-white border rounded-lg shadow-lg hidden z-50">
+          <ul class="text-left text-sm text-gray-700">
+            <li><a id="menuLogin" href="/login" class="block px-4 py-2 hover:bg-gray-100">Login</a></li>
+            <li><a id="menuLogout" href="/logout" class="block px-4 py-2 hover:bg-gray-100 hidden">Logout</a></li>
+            <li><a href="#customerCare" class="block px-4 py-2 hover:bg-gray-100">Customer Care</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </nav>
+  
+  <!-- Include Flash Messages -->
+  {% include 'flash_messages.html' %}
+
+  <!-- Hero Section -->
+  <section id="home" class="bg-green-100 py-24 text-center fade-in px-4">
+    <h2 class="text-5xl font-bold text-green-800 mb-4">CropAssist – खेती का स्मार्ट समाधान</h2>
+    <p class="text-xl text-green-900 mb-6">Make smarter farming decisions with AI-powered recommendations.</p>
+    <div class="text-lg text-gray-700 space-y-2">
+      <p><span class="emoji-animated">🌱</span> What crop should you grow?</p>
+      <p><span class="emoji-animated">🧪</span> What fertilizer should you use?</p>
+      <p><span class="emoji-animated">🌿</span> Which disease is affecting your plant?</p>
+      <p><span class="emoji-animated">💊</span> How can you treat it effectively?</p>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section id="about" class="container mx-auto py-20 px-6 fade-in">
+    <div class="flex flex-col md:flex-row items-center">
+      <div class="md:w-1/2 mb-8 md:mb-0">
+        <img src="https://via.placeholder.com/500x300" alt="CropAssist" class="rounded-xl shadow-lg w-full object-cover" />
+      </div>
+      <div class="md:w-1/2 md:pl-10">
+        <h3 class="text-4xl font-semibold text-green-700 mb-6">About Us</h3>
+        <p class="text-lg text-gray-700 mb-4">
+          Improving agriculture, improving lives. CropAssist empowers farmers with machine learning tools to choose the right crops, manage nutrients, and detect diseases early.
+        </p>
+        <p class="text-base text-gray-600">We combine AI and agricultural knowledge to help you grow better, faster, and healthier crops.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services -->
+  <section id="services" class="py-20 bg-white px-6 fade-in">
+    <div class="container mx-auto text-center">
+      <h3 class="text-4xl font-semibold text-green-700 mb-10">Our Services</h3>
+      <div class="grid md:grid-cols-3 gap-8">        <a href="#" onclick="requireLogin(event, '/predict_crop')" class="card bg-green-100 p-6 rounded-xl shadow hover:shadow-lg">
+          <div class="text-4xl mb-4 emoji-animated">🌱</div>
+          <h4 class="text-xl font-bold text-green-800 mb-2">Crop Recommendation</h4>
+          <p class="text-gray-700">AI-driven crop suggestions based on your soil and climate.</p>
+        </a>
+        <a href="#" onclick="requireLogin(event, '/fertility')" class="card bg-yellow-100 p-6 rounded-xl shadow hover:shadow-lg">
+          <div class="text-4xl mb-4 emoji-animated">🧪</div>
+          <h4 class="text-xl font-bold text-yellow-800 mb-2">Fertility Analysis</h4>
+          <p class="text-gray-700">Know what your soil lacks with smart nutrient diagnostics.</p>
+        </a>
+        <div class="card bg-red-100 p-6 rounded-xl shadow hover:shadow-lg">
+          <div class="text-4xl mb-4 emoji-animated">🌿</div>
+          <h4 class="text-xl font-bold text-red-700 mb-2">Disease Detection</h4>
+          <p class="text-gray-700 mb-3">Upload a plant photo and detect diseases early with AI.</p>
+          <div class="flex justify-center space-x-2">
+            <a href="#" onclick="requireLogin(event, '/diseases')" class="bg-red-600 text-white px-3 py-1 rounded-lg text-sm hover:bg-red-700">
+              Detect
+            </a>
+            <a href="#" onclick="requireLogin(event, '/disease_history')" class="bg-purple-600 text-white px-3 py-1 rounded-lg text-sm hover:bg-purple-700">
+              View History
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+   <!-- Feedback -->
+  <section id="feedback" class="py-20 bg-gradient-to-br from-green-50 to-green-100 px-6 fade-in">
+    <div class="container mx-auto">
+      <div class="text-center mb-12">
+        <h3 class="text-5xl font-extrabold text-green-700 mb-4 tracking-tight">💬 We Value Your Feedback</h3>
+        <p class="text-lg text-gray-700 max-w-2xl mx-auto">Tell us what you love or where we can improve — every word matters to us!</p>
+      </div>
+      <div class="bg-white p-10 rounded-3xl shadow-2xl max-w-4xl mx-auto border border-green-200">
+        <form action="/submit_feedback" method="POST" onsubmit="showThanks(event)" class="space-y-6">
+          <div class="grid md:grid-cols-2 gap-6">
+            <input type="text" name="name" placeholder="👤 Your Full Name" class="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-400" required />
+            <input type="email" name="email" placeholder="📧 Email Address" class="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-400" required />
+          </div>
+          <textarea name="feedback" placeholder="📝 Your feedback helps us improve..." rows="6" class="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-400" required></textarea>
+          <button type="submit" class="btn bg-gradient-to-r from-green-500 to-green-700 text-white py-3 px-10 rounded-xl w-full text-lg font-semibold hover:from-green-600 hover:to-green-800">🚀 Send Feedback</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Thank You Popup -->
+  <div id="thankYouPopup" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 hidden z-50">
+    <div class="bg-white rounded-3xl p-10 max-w-md text-center shadow-2xl animate-slideUp">
+      <div class="text-5xl mb-4 emoji-animated">🎉</div>
+      <h2 class="text-3xl font-extrabold text-green-700 mb-2">Thanks for Helping Us Grow!</h2>
+      <p class="text-gray-600 mb-6">Your words water our mission — we're grateful for your support and feedback.</p>
+      <button onclick="closeThankYouPopup()" class="bg-green-600 text-white px-6 py-2 rounded-full hover:bg-green-700 transition transform hover:scale-105">Close</button>
+    </div>
+  </div>
+
+  <!-- Customer Care Section -->
+  <section id="customerCare" class="py-20 bg-white px-6 fade-in">
+    <div class="container mx-auto text-center">
+      <h3 class="text-4xl font-semibold text-green-700 mb-6">Customer Care</h3>
+      <p class="text-lg text-gray-700 mb-6">Have questions? We're here to help.</p>
+      <p class="text-base text-gray-600 mb-2">🧑‍💻 Created with love by ❤️: Shivansh Jain</p>
+      <p class="text-base text-gray-600 mb-2">📞 Phone: +91-7900921775</p>
+      <p class="text-base text-gray-600 mb-2">📧 Email: sjshivanshjain@gmail.com</p>
+      <p class="text-base text-gray-600">🕒 Available: Mon–Fri, 9:00 AM – 6:00 PM</p>
+    </div>
+  </section>
+  <!-- Login Modal -->
+  <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white rounded-lg p-8 max-w-md w-full shadow-lg text-center">
+      <h2 class="text-2xl font-bold text-green-700 mb-4">Login Required</h2>
+      <p class="text-gray-700 mb-6">Please log in to access this feature or register if you're new.</p>
+      <div class="flex justify-center gap-4 mb-4">
+        <a href="/login" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700" onclick="closeModal()">Login</a>
+        <a href="/register" class="bg-yellow-500 text-white px-6 py-2 rounded-lg hover:bg-yellow-600" onclick="closeModal()">Register</a>
+      </div>
+      <button onclick="closeModal()" class="block mt-2 text-sm text-gray-500 hover:underline">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-green-700 text-white text-center p-4">
+    &copy; 2025 CropAssist Solution. All rights reserved.
+  </footer>
+<script>
+  
+  function selectLanguage(lang) {
+  localStorage.setItem("preferredLanguage", lang);
+  document.getElementById("languageModal").classList.add("hidden");
+  // Optionally, apply translation or redirect
+  console.log("Selected language:", lang);
+}
+
+
+window.addEventListener("load", function () {
+  const savedLang = localStorage.getItem("preferredLanguage");
+  if (!savedLang) {
+    document.getElementById("languageModal").classList.remove("hidden");
+  }
+});
+
+  let isLoggedIn = {{ 'true' if logged_in else 'false' }};
+  let userName = "{% if user_name %}{{ user_name }}{% else %}User{% endif %}";
+  
+  // Update UI based on login status
+  function updateLoginUI() {
+    const loginLink = document.getElementById('menuLogin');
+    const logoutLink = document.getElementById('menuLogout');
+    
+    if (isLoggedIn) {
+      loginLink.classList.add('hidden');
+      logoutLink.classList.remove('hidden');
+    } else {
+      loginLink.classList.remove('hidden');
+      logoutLink.classList.add('hidden');
+    }
+  }
+  
+  // Call this when the page loads
+  document.addEventListener('DOMContentLoaded', function() {
+    updateLoginUI();
+  });
+
+  function requireLogin(event, url) {
+    event.preventDefault();
+    if (isLoggedIn) {
+      window.location.href = url;
+    } else {
+      openLoginModal();
+    }
+  }
+
+  function openLoginModal() {
+    document.getElementById('loginModal').classList.remove('hidden');
+  }
+
+  function closeModal() {
+    document.getElementById('loginModal').classList.add('hidden');
+  }
+
+  function toggleAccountMenu() {
+    document.getElementById('accountMenu').classList.toggle('hidden');
+    updateAccountMenu();
+  }
+  function updateAccountMenu() {
+    const loginItem = document.getElementById('menuLogin');
+    const logoutItem = document.getElementById('menuLogout');
+    if (isLoggedIn) {
+      loginItem.classList.add('hidden');
+      logoutItem.classList.remove('hidden');
+    } else {
+      loginItem.classList.remove('hidden');
+      logoutItem.classList.add('hidden');
+    }
+  }
+
+  function showThanks(event) {
+    event.preventDefault();
+    document.getElementById("thankYouPopup").classList.remove("hidden");
+    // Optional: if you want to send form data via JS, use fetch here instead
+    // Or keep default backend POST handling and remove preventDefault
+  }
+
+  function closeThankYouPopup() {
+    document.getElementById("thankYouPopup").classList.add("hidden");
+    document.querySelector("#feedback form").reset();
+  }
+
+  document.addEventListener("click", function (e) {
+    const menu = document.getElementById("accountMenu");
+    if (!e.target.closest("#accountMenu") && !e.target.closest("button")) {
+      menu.classList.add("hidden");
+    }
+  });
+</script>
+<script>
+  const translations = {
+    english: {
+      title: "CropAssist Solution",
+      heroTitle: "CropAssist – Smart Solutions for Farming",
+      heroSubtitle: "Make smarter farming decisions with AI-powered recommendations.",
+      cropQuestion: "🌱 What crop should you grow?",
+      fertQuestion: "🧪 What fertilizer should you use?",
+      diseaseQuestion: "🌿 Which disease is affecting your plant?",
+      treatmentQuestion: "💊 How can you treat it effectively?",
+      feedbackTitle: "💬 We Value Your Feedback",
+      feedbackSub: "Tell us what you love or where we can improve — every word matters to us!",
+      sendFeedback: "🚀 Send Feedback",
+      customerCare: "Customer Care",
+      questionsHelp: "Have questions? We're here to help.",
+    },
+    hindi: {
+      title: "फार्मईज़ी समाधान",
+      heroTitle: "फार्मईज़ी – खेती का स्मार्ट समाधान",
+      heroSubtitle: "एआई-संचालित सिफारिशों के साथ बेहतर खेती निर्णय लें।",
+      cropQuestion: "🌱 आपको कौन सी फसल उगानी चाहिए?",
+      fertQuestion: "🧪 कौन सा उर्वरक उपयोग करना चाहिए?",
+      diseaseQuestion: "🌿 आपकी फसल में कौन सी बीमारी है?",
+      treatmentQuestion: "💊 इसका सही इलाज क्या है?",
+      feedbackTitle: "💬 हमें आपकी राय की आवश्यकता है",
+      feedbackSub: "आपको क्या पसंद है या हम कहां सुधार कर सकते हैं — हर शब्द हमारे लिए मायने रखता है!",
+      sendFeedback: "🚀 फीडबैक भेजें",
+      customerCare: "ग्राहक सेवा",
+      questionsHelp: "कोई प्रश्न है? हम सहायता के लिए उपलब्ध हैं।",
+    }
+  };
+
+  function applyLanguage(lang) {
+    const t = translations[lang];
+    document.title = t.title;
+    document.querySelector("#home h2").innerText = t.heroTitle;
+    document.querySelector("#home p").innerText = t.heroSubtitle;
+
+    const lines = document.querySelectorAll("#home .text-lg p");
+    lines[0].innerText = t.cropQuestion;
+    lines[1].innerText = t.fertQuestion;
+    lines[2].innerText = t.diseaseQuestion;
+    lines[3].innerText = t.treatmentQuestion;
+
+    document.querySelector("#feedback h3").innerText = t.feedbackTitle;
+    document.querySelector("#feedback p").innerText = t.feedbackSub;
+    document.querySelector("#feedback button[type='submit']").innerText = t.sendFeedback;
+
+    document.querySelector("#customerCare h3").innerText = t.customerCare;
+    document.querySelector("#customerCare p").innerText = t.questionsHelp;
+  }
+
+  function selectLanguage(lang) {
+    localStorage.setItem("preferredLanguage", lang);
+    document.getElementById("languageModal").classList.add("hidden");
+    applyLanguage(lang);
+  }
+
+  window.addEventListener("load", function () {
+    const savedLang = localStorage.getItem("preferredLanguage") || "english";
+    applyLanguage(savedLang);
+    if (!localStorage.getItem("preferredLanguage")) {
+      document.getElementById("languageModal").classList.remove("hidden");
+    }
+  });
+</script>
+
+
+</body>
+</html>

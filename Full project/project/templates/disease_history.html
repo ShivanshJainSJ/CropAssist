@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Disease Detection History - CROPASSIST</title>
+  <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Custom animation for button hover */
+    @keyframes fadeIn {
+      0% {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .fade-in {
+      animation: fadeIn 1s ease-out;
+    }
+
+    /* Hover effects for buttons and cards */
+    .hover-scale:hover {
+      transform: scale(1.02);
+    }
+
+    .history-card {
+      transition: all 0.3s ease;
+    }
+      .history-card:hover {
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+    
+    /* Checkbox styling */
+    .detection-checkbox {
+      cursor: pointer;
+      transition: opacity 0.3s ease;
+    }
+    
+    .checkbox-indicator {
+      transition: all 0.3s ease;
+    }
+    
+    .detection-checkbox:checked + .checkbox-indicator {
+      background-color: #10B981;
+      border-color: #059669;
+    }
+    
+    .detection-checkbox:checked + .checkbox-indicator::after {
+      content: "✓";
+      position: absolute;
+      color: white;
+      font-size: 14px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-to-br from-green-100 via-yellow-50 to-green-200 text-gray-900">
+
+  <!-- Navbar -->
+  <nav class="bg-white shadow-lg py-4">
+    <div class="container mx-auto flex justify-between items-center px-4">
+      <div class="flex items-center space-x-3">
+        <img src="https://cdn-icons-png.flaticon.com/512/2913/2913461.png" alt="logo" class="w-12 h-12" />
+        <h1 class="text-3xl font-bold text-red-700">CropAssist Solution</h1>
+      </div>
+      <div class="flex space-x-4">
+        <a href="{{ url_for('diseases') }}" class="text-green-700 hover:underline text-sm font-medium">New Detection</a>
+        <a href="{{ url_for('home') }}" class="text-red-700 hover:underline text-sm font-medium">← Back to Home</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <div class="container mx-auto mt-4">
+        {% for message in messages %}
+          <div class="flash-message p-4 mb-4 rounded-lg {% if '✅' in message %}bg-green-100 text-green-800 border border-green-300{% else %}bg-red-100 text-red-800 border border-red-300{% endif %} transition-opacity duration-1000">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- History Section -->  <section class="container mx-auto py-12 px-4">
+    <h2 class="text-4xl font-bold text-red-700 mb-6 text-center fade-in">🌿 Your Disease Detection History</h2>
+    <p class="text-xl text-gray-700 mb-6 text-center max-w-3xl mx-auto">View your plant's health journey over time. Track disease detections and treatment recommendations to monitor your plants' progress.</p>    <!-- Statistics Dashboard -->
+    <div class="bg-white rounded-xl shadow-md p-6 mb-8 max-w-4xl mx-auto opacity-0" id="stats-dashboard">
+      <h3 class="text-xl font-bold text-gray-800 mb-4 pb-2 border-b">Plant Health Dashboard</h3>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <!-- Total Detections -->
+        <div class="bg-blue-50 rounded-lg p-4 text-center transform hover:scale-105 transition duration-300">
+          <span class="text-3xl font-bold text-blue-600 counter" data-target="{{ stats.total }}">0</span>
+          <p class="text-sm text-gray-600">Total Detections</p>
+        </div>
+        
+        <!-- Healthy Plants -->
+        <div class="bg-green-50 rounded-lg p-4 text-center transform hover:scale-105 transition duration-300">
+          <span class="text-3xl font-bold text-green-600 counter" data-target="{{ stats.healthy }}">0</span>
+          <p class="text-sm text-gray-600">Healthy Plants</p>
+        </div>
+        
+        <!-- Diseased Plants -->
+        <div class="bg-red-50 rounded-lg p-4 text-center transform hover:scale-105 transition duration-300">
+          <span class="text-3xl font-bold text-red-600 counter" data-target="{{ stats.diseased }}">0</span>
+          <p class="text-sm text-gray-600">Diseased Plants</p>
+        </div>
+        
+        <!-- Health Score -->
+        <div class="bg-purple-50 rounded-lg p-4 text-center transform hover:scale-105 transition duration-300">
+          <div class="relative h-16 flex items-center justify-center">
+            <div class="absolute inset-0 flex items-center justify-center">
+              <svg class="w-16 h-16" viewBox="0 0 36 36">
+                <path
+                  d="M18 2.0845
+                     a 15.9155 15.9155 0 0 1 0 31.831
+                     a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none"
+                  stroke="#eee"
+                  stroke-width="3"
+                />
+                <path
+                  d="M18 2.0845
+                     a 15.9155 15.9155 0 0 1 0 31.831
+                     a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none"
+                  stroke="{{ 'green' if stats.health_percentage > 60 else 'orange' if stats.health_percentage > 30 else 'red' }}"
+                  stroke-width="3"
+                  stroke-dasharray="0, 100"
+                  stroke-linecap="round"
+                  class="progress-circle"
+                  data-percentage="{{ stats.health_percentage }}"
+                />
+              </svg>
+              <span class="absolute text-lg font-bold counter-percentage" data-target="{{ stats.health_percentage }}">0%</span>
+            </div>
+          </div>
+          <p class="text-sm text-gray-600 mt-2">Health Score</p>
+        </div>
+      </div>
+      
+      {% if stats.most_recent %}
+      <div class="mt-4 text-center">
+        <p class="text-sm text-gray-600">Last detection: <span class="font-semibold">{{ stats.most_recent }}</span></p>
+      </div>
+      {% endif %}
+    </div>
+    
+    <!-- Filter Controls -->    <div class="bg-white rounded-xl shadow-md p-4 mb-8 max-w-4xl mx-auto">
+      <form action="{{ url_for('disease_history') }}" method="get" class="flex flex-wrap gap-4 items-end justify-center">
+        <div class="flex flex-col">
+          <label for="plant-filter" class="text-sm text-gray-600 mb-1">Plant Type</label>
+          <select id="plant-filter" name="plant" class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-green-400 focus:outline-none">
+            <option value="all" {% if current_plant == 'all' %}selected{% endif %}>All Plants</option>
+            {% for plant in plant_types %}
+              <option value="{{ plant }}" {% if current_plant == plant %}selected{% endif %}>{{ plant.replace('_', ' ') }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="flex flex-col">
+          <label for="health-filter" class="text-sm text-gray-600 mb-1">Health Status</label>
+          <select id="health-filter" name="health" class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-green-400 focus:outline-none">
+            <option value="all" {% if current_health == 'all' %}selected{% endif %}>All</option>
+            <option value="healthy" {% if current_health == 'healthy' %}selected{% endif %}>Healthy</option>
+            <option value="diseased" {% if current_health == 'diseased' %}selected{% endif %}>Diseased</option>
+          </select>
+        </div>
+        <div class="flex flex-col">
+          <label for="date-from" class="text-sm text-gray-600 mb-1">From Date</label>
+          <input type="date" id="date-from" name="date_from" value="{{ date_from }}" 
+                 class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-green-400 focus:outline-none">
+        </div>
+        <div class="flex flex-col">
+          <label for="date-to" class="text-sm text-gray-600 mb-1">To Date</label>
+          <input type="date" id="date-to" name="date_to" value="{{ date_to }}"
+                 class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-green-400 focus:outline-none">
+        </div>
+        <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-300">
+          Apply Filters
+        </button>
+        <a href="{{ url_for('disease_history') }}" class="text-green-600 px-4 py-2 hover:text-green-800 transition duration-300">
+          Clear Filters
+        </a>
+      </form>
+    </div>
+      {% if history and history|length > 0 %}
+      <div class="mb-4 flex justify-between items-center">
+        <h3 class="text-xl font-bold text-gray-700">Detection Records ({{ history|length }})</h3>
+        <form id="batch-delete-form" action="{{ url_for('batch_delete_detections') }}" method="post" class="hidden">
+          <input type="hidden" name="detection_ids" id="batch-delete-ids">
+        </form>
+        <div class="flex items-center">
+          <button id="select-all-btn" class="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600 transition duration-300 text-sm mr-2">
+            Select All
+          </button>
+          <button id="clear-selection-btn" class="bg-gray-500 text-white px-3 py-1 rounded-lg hover:bg-gray-600 transition duration-300 text-sm mr-2 hidden">
+            Clear Selection
+          </button>
+          <button id="batch-delete-btn" class="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 transition duration-300 text-sm hidden" onclick="confirmBatchDelete()">
+            Delete Selected
+          </button>
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {% for entry in history %}
+          <div class="bg-white rounded-xl shadow-md overflow-hidden history-card hover-scale">
+            <div class="flex flex-col md:flex-row">
+              <div class="md:w-1/3 p-4">
+                <div class="relative">
+                  <input type="checkbox" class="detection-checkbox absolute top-2 left-2 w-5 h-5 opacity-0 z-10 cursor-pointer" data-id="{{ entry._id }}">
+                  <div class="checkbox-indicator absolute top-2 left-2 w-5 h-5 border-2 border-gray-300 rounded-md bg-white"></div>
+                  <img src="data:image/jpeg;base64,{{ entry.image }}" alt="Plant image" class="rounded-lg shadow w-full h-auto object-cover">
+                </div>
+                <p class="text-sm text-gray-500 mt-2">{{ entry.timestamp }}</p>
+              </div>              
+              <div class="md:w-2/3 p-4">
+                <div class="flex justify-between items-start">
+                  <h3 class="text-xl font-bold mb-2 {% if 'healthy' in entry.disease %}text-green-700{% else %}text-red-700{% endif %}">
+                    {{ entry.disease.replace('___', ' - ').replace('_', ' ') }}
+                  </h3>
+                  <a href="{{ url_for('delete_detection', detection_id=entry._id) }}" 
+                     onclick="return confirm('Are you sure you want to delete this record?')"
+                     class="text-red-500 hover:text-red-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg>
+                  </a>
+                </div>
+                <p class="text-sm text-gray-600 mb-3">Confidence: {{ "%.2f"|format(entry.confidence) }}%</p>
+                <div class="bg-gray-50 p-3 rounded-lg">
+                  <h4 class="font-bold text-gray-800 mb-1 text-sm">Treatment Recommendation:</h4>
+                  <p class="text-gray-700 text-sm">{{ entry.treatment }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="bg-white rounded-xl shadow-md overflow-hidden p-8 text-center max-w-2xl mx-auto">
+        <img src="https://cdn-icons-png.flaticon.com/512/1829/1829704.png" alt="Empty history" class="w-24 h-24 mx-auto mb-4 opacity-50">
+        <h3 class="text-2xl font-bold text-gray-700 mb-2">No Detection History Yet</h3>
+        <p class="text-gray-600 mb-6">You haven't performed any plant disease detections yet. Start by analyzing your first plant!</p>
+        <a href="{{ url_for('diseases') }}" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition duration-300 inline-block">
+          Detect Plant Disease
+        </a>
+      </div>
+    {% endif %}
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-white text-center py-6 mt-10">
+    <p class="text-lg">&copy; 2025 CropAssist Solution. All rights reserved.</p>
+  </footer>
+    <script>
+    // Add flash messages auto-hide functionality
+    setTimeout(function() {
+      const flashMessages = document.querySelectorAll('.flash-message');
+      flashMessages.forEach(message => {
+        message.style.opacity = '0';
+        setTimeout(() => message.remove(), 1000);
+      });
+    }, 5000);
+    
+    // Counter animation
+    function animateCounters() {
+      const counters = document.querySelectorAll('.counter');
+      const counterPercentage = document.querySelector('.counter-percentage');
+      const progressCircle = document.querySelector('.progress-circle');
+      const percentage = parseInt(progressCircle.getAttribute('data-percentage'));
+      
+      // Fade in dashboard
+      document.getElementById('stats-dashboard').style.opacity = '1';
+      document.getElementById('stats-dashboard').style.transition = 'opacity 0.5s ease-in';
+      
+      // Animate counters
+      counters.forEach(counter => {
+        const target = parseInt(counter.getAttribute('data-target'));
+        const duration = 1500; // 1.5 seconds
+        const frameRate = 30; // frames per second
+        const totalFrames = duration / 1000 * frameRate;
+        const increment = target / totalFrames;
+        
+        let count = 0;
+        const timer = setInterval(() => {
+          count += increment;
+          if (count >= target) {
+            counter.innerText = target;
+            clearInterval(timer);
+          } else {
+            counter.innerText = Math.floor(count);
+          }
+        }, 1000 / frameRate);
+      });
+      
+      // Animate percentage counter
+      let percentCount = 0;
+      const percentTarget = parseInt(counterPercentage.getAttribute('data-target'));
+      const percentDuration = 1500;
+      const percentFrameRate = 30;
+      const percentTotalFrames = percentDuration / 1000 * percentFrameRate;
+      const percentIncrement = percentTarget / percentTotalFrames;
+      
+      let percentTimer = setInterval(() => {
+        percentCount += percentIncrement;
+        if (percentCount >= percentTarget) {
+          counterPercentage.innerText = `${percentTarget}%`;
+          clearInterval(percentTimer);
+        } else {
+          counterPercentage.innerText = `${Math.floor(percentCount)}%`;
+        }
+      }, 1000 / percentFrameRate);
+      
+      // Animate circle
+      setTimeout(() => {
+        progressCircle.style.transition = 'stroke-dasharray 1.5s ease-in-out';
+        progressCircle.setAttribute('stroke-dasharray', `${percentage}, 100`);
+      }, 200);
+    }
+    
+    // Run animations when page loads
+    window.addEventListener('load', animateCounters);
+    
+    // Batch delete functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const selectAllBtn = document.getElementById('select-all-btn');
+      const clearSelectionBtn = document.getElementById('clear-selection-btn');
+      const batchDeleteBtn = document.getElementById('batch-delete-btn');
+      const checkboxes = document.querySelectorAll('.detection-checkbox');
+      const indicators = document.querySelectorAll('.checkbox-indicator');
+      
+      // Toggle checkbox visibility on hover
+      document.querySelectorAll('.history-card').forEach((card, index) => {
+        card.addEventListener('mouseenter', () => {
+          checkboxes[index].classList.remove('opacity-0');
+          indicators[index].classList.remove('opacity-0');
+        });
+        card.addEventListener('mouseleave', () => {
+          if (!checkboxes[index].checked) {
+            checkboxes[index].classList.add('opacity-0');
+            indicators[index].classList.add('opacity-0');
+          }
+        });
+      });
+      
+      // Handle checkbox changes
+      checkboxes.forEach((checkbox, index) => {
+        checkbox.addEventListener('change', function() {
+          if (this.checked) {
+            indicators[index].classList.add('bg-green-500');
+            indicators[index].classList.add('border-green-600');
+          } else {
+            indicators[index].classList.remove('bg-green-500');
+            indicators[index].classList.remove('border-green-600');
+          }
+          
+          updateBatchDeleteButton();
+        });
+      });
+      
+      // Select All functionality
+      selectAllBtn.addEventListener('click', function() {
+        checkboxes.forEach((checkbox, index) => {
+          checkbox.checked = true;
+          indicators[index].classList.add('bg-green-500');
+          indicators[index].classList.add('border-green-600');
+          checkbox.classList.remove('opacity-0');
+          indicators[index].classList.remove('opacity-0');
+        });
+        
+        updateBatchDeleteButton();
+        selectAllBtn.classList.add('hidden');
+        clearSelectionBtn.classList.remove('hidden');
+      });
+      
+      // Clear selection functionality
+      clearSelectionBtn.addEventListener('click', function() {
+        checkboxes.forEach((checkbox, index) => {
+          checkbox.checked = false;
+          indicators[index].classList.remove('bg-green-500');
+          indicators[index].classList.remove('border-green-600');
+          checkbox.classList.add('opacity-0');
+          indicators[index].classList.add('opacity-0');
+        });
+        
+        updateBatchDeleteButton();
+        selectAllBtn.classList.remove('hidden');
+        clearSelectionBtn.classList.add('hidden');
+      });
+      
+      function updateBatchDeleteButton() {
+        const selectedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+        
+        if (selectedCount > 0) {
+          batchDeleteBtn.classList.remove('hidden');
+          batchDeleteBtn.textContent = `Delete Selected (${selectedCount})`;
+        } else {
+          batchDeleteBtn.classList.add('hidden');
+          clearSelectionBtn.classList.add('hidden');
+          selectAllBtn.classList.remove('hidden');
+        }
+      }
+    });
+    
+    function confirmBatchDelete() {
+      const selectedCheckboxes = document.querySelectorAll('.detection-checkbox:checked');
+      if (selectedCheckboxes.length === 0) return;
+      
+      if (confirm(`Are you sure you want to delete ${selectedCheckboxes.length} detection records? This action cannot be undone.`)) {
+        const selectedIds = Array.from(selectedCheckboxes).map(cb => cb.getAttribute('data-id')).join(',');
+        document.getElementById('batch-delete-ids').value = selectedIds;
+        document.getElementById('batch-delete-form').submit();
+      }
+    }
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - CROPASSIST</title>
+  <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-image: url('https://images.unsplash.com/photo-1587721347089-885d79f8b3a4?auto=format&fit=crop&w=1600&q=80');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    .glass-card {
+      backdrop-filter: blur(16px);
+      background-color: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      animation: fadeInUp 1s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      0% {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .input-hover:focus {
+      border-color: #22c55e;
+      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.2);
+    }
+
+    .loading-spinner {
+      border-top: 2px solid transparent;
+      border-right: 2px solid transparent;
+      border-bottom: 2px solid transparent;
+      border-left: 2px solid #fff;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center relative">
+  <div class="glass-card shadow-2xl rounded-2xl px-10 py-12 max-w-md w-full">
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="mb-4">
+          {% for message in messages %}
+            <div class="{% if '✅' in message %}bg-green-100 text-green-700{% else %}bg-red-100 text-red-700{% endif %} p-3 rounded-md mb-2">
+              <p class="font-medium">{{ message }}</p>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+      <!-- Logo and Header -->
+    <div class="text-center mb-8">
+      <img src="{{ url_for('static', filename='images/logo.png') }}" alt="CROPASSIST Logo" class="w-20 mx-auto mb-3 animate-bounce" />
+      <h2 class="text-3xl font-bold text-green-800">Welcome Back</h2>
+      <p class="text-sm text-gray-600">Login to access your CROPASSIST tools</p>
+    </div><!-- Form -->
+    <form id="loginForm" action="/login" method="POST" class="space-y-6">
+      <div>
+        <label for="email" class="block text-gray-700 font-medium mb-1">Email</label>
+        <input type="email" id="email" name="email" required
+               class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 input-hover transition duration-300" />
+      </div>
+      <div>
+        <label for="password" class="block text-gray-700 font-medium mb-1">Password</label>
+        <input type="password" id="password" name="password" required
+               class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 input-hover transition duration-300" />
+      </div>
+      <button type="submit"
+              class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transform hover:scale-105 transition-all duration-300 flex justify-center items-center"
+              id="loginButton">
+        <span id="buttonText">Log In</span>
+        <div id="spinner" class="loading-spinner hidden ml-2"></div>
+      </button>
+    </form>    <!-- Links -->
+    <div class="text-center text-sm text-gray-600 mt-6">
+      Don't have an account?
+      <a href="/register" class="text-green-700 font-medium hover:underline">Register here</a>
+    </div>
+    <div class="text-center mt-2">
+      <a href="/" class="text-sm text-gray-500 hover:underline">← Back to Home</a>
+    </div>
+  </div>
+  <!-- JavaScript for button animation -->
+  <script>
+    const form = document.getElementById('loginForm');
+    const loginButton = document.getElementById('loginButton');
+    const buttonText = document.getElementById('buttonText');
+    const spinner = document.getElementById('spinner');
+
+    form.addEventListener('submit', function () {
+      // Start spinner and change button text
+      loginButton.disabled = true;
+      buttonText.textContent = 'Logging in...';
+      spinner.classList.remove('hidden');
+      
+      // The form will now submit to the server
+      // No preventDefault() to allow normal form submission
+    });
+  </script>
+
+</body>
+</html>

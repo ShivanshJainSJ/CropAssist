@@ -1,0 +1,12 @@
+<!-- Flash Messages -->
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div class="fixed top-20 right-4 z-50">
+      {% for message in messages %}
+        <div class="bg-white border-l-4 {% if '✅' in message %}border-green-500{% else %}border-red-500{% endif %} p-4 mb-4 shadow-md rounded-r animate-fadeIn">
+          <p class="font-medium">{{ message }}</p>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
