@@ -4,10 +4,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Disease Detection - CROPASSIST</title>
+  <title>Disease Detection - AgriTech</title>
   <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
+  <script src="https://cdn.tailwindcss.com"></script>  <style>
     /* Custom animation for button hover */
     @keyframes fadeIn {
       0% {
@@ -33,6 +32,21 @@
     .focus-ring:focus {
       box-shadow: 0 0 0 3px rgba(248, 113, 54, 0.7);
     }
+    
+    /* Confidence bar styling */
+    .confidence-bar {
+      height: 8px;
+      border-radius: 4px;
+      background: linear-gradient(90deg, #f87171, #ef4444, #dc2626);
+    }
+    
+    .confidence-bar.high {
+      background: linear-gradient(90deg, #10b981, #059669, #047857);
+    }
+    
+    .confidence-bar.medium {
+      background: linear-gradient(90deg, #fbbf24, #f59e0b, #d97706);
+    }
   </style>
 </head>
 
@@ -42,7 +56,7 @@
     <div class="container mx-auto flex justify-between items-center px-4">
       <div class="flex items-center space-x-3">
         <img src="https://cdn-icons-png.flaticon.com/512/2913/2913461.png" alt="logo" class="w-12 h-12" />
-        <h1 class="text-3xl font-bold text-red-700">CropAssist Solution</h1>
+        <h1 class="text-3xl font-bold text-red-700">AgriTech Solution</h1>
       </div>
       <div class="flex space-x-4">
         <a href="{{ url_for('disease_history') }}" class="text-green-700 hover:underline text-sm font-medium">View Detection History</a>
@@ -68,21 +82,116 @@
     <h2 class="text-4xl font-bold text-red-700 mb-6 animate__animated animate__fadeIn animate__delay-1s">🌿 Disease Detection</h2>
     <p class="text-xl text-gray-700 mb-6">Upload an image of your plant to detect diseases early and get recommendations for treatment.</p>
 
-    {% if prediction_result %}
-    <!-- Prediction Results -->
-    <div class="max-w-2xl mx-auto bg-gray-50 p-8 rounded-xl shadow-lg mb-10">
+    {% if quality_assessment %}
+    <!-- Image Quality Issues -->
+    <div class="max-w-lg mx-auto bg-amber-50 p-8 rounded-xl shadow-lg mb-10">
+      <h3 class="text-xl font-bold text-amber-800 mb-4">⚠️ Image Quality Issues Detected</h3>
+      
+      <div class="mb-6">
+        <h4 class="font-bold text-gray-800 mb-2">Problems found:</h4>
+        <ul class="list-disc pl-5 space-y-2">
+          {% for warning in warnings %}
+            <li class="text-gray-700">{{ warning }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      
+      <div class="mb-6">
+        <h4 class="font-bold text-gray-800 mb-2">Suggestions:</h4>
+        <ul class="list-disc pl-5 space-y-2">
+          {% for suggestion in suggestions %}
+            <li class="text-gray-700">{{ suggestion }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      
+      <p class="text-amber-700 mb-6">
+        For accurate disease detection, please take a new photo following these suggestions.
+      </p>
+      
+      <a href="{{ url_for('diseases') }}" class="inline-block bg-amber-600 text-white px-6 py-2 rounded hover:bg-amber-700 transition duration-300">
+        Try Again
+      </a>
+    </div>
+    {% elif prediction_result %}<!-- Prediction Results -->
+    <div class="max-w-3xl mx-auto bg-gray-50 p-8 rounded-xl shadow-lg mb-10">
       <div class="flex flex-col md:flex-row">
         <div class="md:w-1/2 mb-6 md:mb-0 md:pr-4">
           <img src="data:image/jpeg;base64,{{ image }}" alt="Uploaded plant image" class="rounded-lg shadow-md w-full h-auto">
+          
+          {% if was_upscaled %}
+            <div class="mt-2 text-xs text-gray-500">
+              <span class="font-medium">Original size:</span> {{ original_dimensions }} (enhanced for analysis)
+            </div>
+          {% endif %}
+          
+          <!-- Quality warnings -->
+          {% if quality_warnings %}
+            <div class="mt-4 p-3 bg-blue-50 border border-blue-200 text-blue-800 rounded-lg text-sm">
+              <p class="font-bold mb-1">ℹ️ Image Quality Notes:</p>
+              <ul class="list-disc pl-5 text-xs space-y-1">
+                {% for warning in quality_warnings %}
+                  <li>{{ warning }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+          
+          <!-- Low confidence warning -->
+          {% if low_confidence %}
+            <div class="mt-4 p-3 bg-amber-100 border border-amber-300 text-amber-800 rounded-lg text-sm">
+              <p class="font-bold">⚠️ {{ confidence_message }}</p>
+              {% if secondary_message %}
+                <p class="mt-1 text-xs">{{ secondary_message }}</p>
+              {% endif %}
+            </div>
+          {% endif %}
         </div>
         <div class="md:w-1/2 text-left md:pl-4">
           <h3 class="text-2xl font-bold mb-2 {% if 'healthy' in disease %}text-green-700{% else %}text-red-700{% endif %}">
             {{ disease.replace('___', ' - ').replace('_', ' ') }}
           </h3>
-          <p class="mb-4 text-gray-600">Confidence: {{ "%.2f"|format(confidence) }}%</p>
-          <div class="bg-gray-100 p-4 rounded-lg">
+          
+          <!-- Confidence Bar -->
+          <div class="mb-4">
+            <div class="flex justify-between items-center mb-1">
+              <span class="text-sm font-medium text-gray-700">Confidence</span>
+              <span class="text-sm font-medium text-gray-700">{{ "%.1f"|format(confidence) }}%</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+              <div class="confidence-bar {% if confidence_level == 'high' %}high{% elif confidence_level == 'medium' %}medium{% endif %}" 
+                  style="width: {{ confidence }}%"></div>
+            </div>
+            <div class="text-xs text-gray-500 mt-1">
+              {% if confidence_level == 'high' %}
+                <span class="text-green-600">● High confidence</span>
+              {% elif confidence_level == 'medium' %}
+                <span class="text-amber-600">● Medium confidence</span>
+              {% else %}
+                <span class="text-red-600">● Low confidence</span>
+              {% endif %}
+            </div>
+          </div>
+          
+          <!-- Other Possible Diseases -->
+          {% if top_3_predictions|length > 1 %}
+            <div class="mb-4">
+              <h4 class="font-bold text-gray-800 mb-2">Alternative Possibilities:</h4>
+              <ul class="space-y-2">
+                {% for pred in top_3_predictions[1:] %}
+                  <li class="flex justify-between items-center text-sm">
+                    <span>{{ pred.disease.replace('___', ' - ').replace('_', ' ') }}</span>
+                    <span class="font-medium">{{ "%.1f"|format(pred.confidence) }}%</span>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+          
+          <!-- Treatment Recommendations -->
+          <div class="bg-gray-100 p-4 rounded-lg mt-4">
             <h4 class="font-bold text-gray-800 mb-2">Treatment Recommendation:</h4>
-            <p class="text-gray-700">{{ treatment }}</p>
+            <div class="text-gray-700 treatment-content">{{ treatment|safe }}</div>
           </div>
         </div>
       </div>
@@ -92,13 +201,25 @@
         </a>
       </div>
     </div>
-    {% else %}
-    <!-- Disease Detection Form -->
+    {% else %}    <!-- Disease Detection Form -->
     <form action="{{ url_for('detect_disease') }}" method="POST" enctype="multipart/form-data" class="max-w-lg mx-auto bg-gray-50 p-8 rounded-xl shadow-lg hover:shadow-xl transition duration-300 ease-in-out hover-scale">
       <label for="image-input" class="block text-lg font-semibold text-gray-800 mb-4">Upload Plant Image</label>
       <input type="file" id="image-input" name="image" accept="image/*" required
         class="w-full p-4 border border-gray-300 rounded-lg mb-6 focus:ring-2 focus:ring-red-400 focus:ring-opacity-50 transition duration-300 ease-in-out"/>
-
+      
+      <!-- Advanced Options -->
+      <div class="mb-4">
+        <details class="bg-gray-100 p-3 rounded-lg">
+          <summary class="font-medium cursor-pointer">Advanced Options</summary>
+          <div class="pt-3">
+            <div class="flex items-center">
+              <input type="checkbox" id="use-augmentation" name="use_augmentation" value="true" class="mr-2 h-4 w-4 text-red-600" checked>
+              <label for="use-augmentation" class="text-sm text-gray-700">Use test-time augmentation for better accuracy (recommended)</label>
+            </div>
+          </div>
+        </details>
+      </div>
+      
       <button type="submit"
         class="bg-red-600 text-white px-6 py-3 rounded-lg w-full hover:bg-red-700 transition duration-300 ease-in-out hover-scale">
         Detect Disease
@@ -109,7 +230,7 @@
 
   <!-- Footer -->
   <footer class="bg-gray-800 text-white text-center py-6 mt-10">
-    <p class="text-lg">&copy; 2025 CropAssist Solution. All rights reserved.</p>
+    <p class="text-lg">&copy; 2025 AgriTech Solution. All rights reserved.</p>
   </footer>
   <script>
     // Add flash messages auto-hide functionality

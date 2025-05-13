@@ -1,10 +1,10 @@
-# CropAssist Solution - Agritech Full Stack Project
+# AgriTech Solution - Agritech Full Stack Project
 
-![CropAssist Logo](https://cdn-icons-png.flaticon.com/512/2913/2913461.png)
+![AgriTech Logo](https://cdn-icons-png.flaticon.com/512/2913/2913461.png)
 
 ## 📋 Project Overview
 
-CropAssist Solution is a comprehensive agricultural technology platform designed to assist farmers in making data-driven decisions to optimize their farming practices. The application leverages machine learning algorithms to provide personalized recommendations for crop selection, soil fertility analysis, and plant disease detection.
+AgriTech Solution is a comprehensive agricultural technology platform designed to assist farmers in making data-driven decisions to optimize their farming practices. The application leverages machine learning algorithms to provide personalized recommendations for crop selection, soil fertility analysis, and plant disease detection.
 
 ## ✨ Features
 
@@ -56,8 +56,8 @@ CropAssist Solution is a comprehensive agricultural technology platform designed
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/CropAssist-solution.git
-   cd CropAssist-solution
+   git clone https://github.com/yourusername/AgriTech-solution.git
+   cd AgriTech-solution
    ```
 
 2. **Create and activate virtual environment (optional but recommended)**

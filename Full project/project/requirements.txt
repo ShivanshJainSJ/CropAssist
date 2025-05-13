@@ -12,7 +12,17 @@ scipy==1.10.1
 
 # Machine Learning
 tensorflow==2.12.0
+tensorflow-hub==0.13.0  # For accessing pre-trained models
+efficientnet==1.1.1  # EfficientNet models for TensorFlow
 Pillow==9.5.0  # For PIL/Image processing
+scikit-learn==1.2.2  # For additional ML utilities
+opencv-python==4.7.0.72  # For image processing and quality assessment
+opencv-contrib-python==4.7.0.72  # For super-resolution models
+
+# Deep Learning Specific
+tensorflow-addons==0.20.0  # Advanced TensorFlow functionalities
+keras-applications==1.0.8  # Keras pre-built applications 
+keras-preprocessing==1.1.2  # Image preprocessing utilities
 
 # Other utilities
 python-dotenv==1.0.0  # For environment variables management

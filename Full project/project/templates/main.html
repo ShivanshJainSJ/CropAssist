@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CROPASSIST</title>
+  <title>AgriTech</title>
   <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png">
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
@@ -48,8 +48,8 @@
   <nav class="bg-white shadow py-4 sticky top-0 z-50">
     <div class="container mx-auto flex justify-between items-center px-6">
       <div class="flex items-center space-x-3">
-        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="CROPASSIST Logo" class="w-12 h-12" />
-        <h1 class="text-2xl font-bold text-green-700">🌾 CropAssist Solution</h1>
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="AgriTech Logo" class="w-12 h-12" />
+        <h1 class="text-2xl font-bold text-green-700">🌾 AgriTech Solution</h1>
       </div>      <ul class="flex gap-6 text-gray-600 font-medium">
         <li><a href="#home" class="hover:text-green-600">Home</a></li>
         <li><a href="#about" class="hover:text-green-600">About</a></li>
@@ -77,7 +77,7 @@
 
   <!-- Hero Section -->
   <section id="home" class="bg-green-100 py-24 text-center fade-in px-4">
-    <h2 class="text-5xl font-bold text-green-800 mb-4">CropAssist – खेती का स्मार्ट समाधान</h2>
+    <h2 class="text-5xl font-bold text-green-800 mb-4">AgriTech – खेती का स्मार्ट समाधान</h2>
     <p class="text-xl text-green-900 mb-6">Make smarter farming decisions with AI-powered recommendations.</p>
     <div class="text-lg text-gray-700 space-y-2">
       <p><span class="emoji-animated">🌱</span> What crop should you grow?</p>
@@ -91,12 +91,12 @@
   <section id="about" class="container mx-auto py-20 px-6 fade-in">
     <div class="flex flex-col md:flex-row items-center">
       <div class="md:w-1/2 mb-8 md:mb-0">
-        <img src="https://via.placeholder.com/500x300" alt="CropAssist" class="rounded-xl shadow-lg w-full object-cover" />
+        <img src="https://via.placeholder.com/500x300" alt="AgriTech" class="rounded-xl shadow-lg w-full object-cover" />
       </div>
       <div class="md:w-1/2 md:pl-10">
         <h3 class="text-4xl font-semibold text-green-700 mb-6">About Us</h3>
         <p class="text-lg text-gray-700 mb-4">
-          Improving agriculture, improving lives. CropAssist empowers farmers with machine learning tools to choose the right crops, manage nutrients, and detect diseases early.
+          Improving agriculture, improving lives. AgriTech empowers farmers with machine learning tools to choose the right crops, manage nutrients, and detect diseases early.
         </p>
         <p class="text-base text-gray-600">We combine AI and agricultural knowledge to help you grow better, faster, and healthier crops.</p>
       </div>
@@ -110,12 +110,11 @@
       <div class="grid md:grid-cols-3 gap-8">        <a href="#" onclick="requireLogin(event, '/predict_crop')" class="card bg-green-100 p-6 rounded-xl shadow hover:shadow-lg">
           <div class="text-4xl mb-4 emoji-animated">🌱</div>
           <h4 class="text-xl font-bold text-green-800 mb-2">Crop Recommendation</h4>
-          <p class="text-gray-700">AI-driven crop suggestions based on your soil and climate.</p>
-        </a>
-        <a href="#" onclick="requireLogin(event, '/fertility')" class="card bg-yellow-100 p-6 rounded-xl shadow hover:shadow-lg">
-          <div class="text-4xl mb-4 emoji-animated">🧪</div>
-          <h4 class="text-xl font-bold text-yellow-800 mb-2">Fertility Analysis</h4>
-          <p class="text-gray-700">Know what your soil lacks with smart nutrient diagnostics.</p>
+          <p class="text-gray-700">AI-driven crop suggestions based on your soil and climate.</p>        </a>
+        <a href="#" onclick="requireLogin(event, '/advanced_fertility')" class="card bg-blue-100 p-6 rounded-xl shadow hover:shadow-lg">
+          <div class="text-4xl mb-4 emoji-animated">🔬</div>
+          <h4 class="text-xl font-bold text-blue-800 mb-2">Fertility Analysis</h4>
+          <p class="text-gray-700">AI-powered comprehensive soil analysis with detailed recommendations.</p>
         </a>
         <div class="card bg-red-100 p-6 rounded-xl shadow hover:shadow-lg">
           <div class="text-4xl mb-4 emoji-animated">🌿</div>
@@ -190,7 +189,7 @@
 
   <!-- Footer -->
   <footer class="bg-green-700 text-white text-center p-4">
-    &copy; 2025 CropAssist Solution. All rights reserved.
+    &copy; 2025 AgriTech Solution. All rights reserved.
   </footer>
 <script>
   
@@ -286,8 +285,8 @@ window.addEventListener("load", function () {
 <script>
   const translations = {
     english: {
-      title: "CropAssist Solution",
-      heroTitle: "CropAssist – Smart Solutions for Farming",
+      title: "AgriTech Solution",
+      heroTitle: "AgriTech – Smart Solutions for Farming",
       heroSubtitle: "Make smarter farming decisions with AI-powered recommendations.",
       cropQuestion: "🌱 What crop should you grow?",
       fertQuestion: "🧪 What fertilizer should you use?",

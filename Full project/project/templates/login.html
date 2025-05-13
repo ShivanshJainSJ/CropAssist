@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login - CROPASSIST</title>
+  <title>Login - AgriTech</title>
   <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png">
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
@@ -76,9 +76,9 @@
     {% endwith %}
       <!-- Logo and Header -->
     <div class="text-center mb-8">
-      <img src="{{ url_for('static', filename='images/logo.png') }}" alt="CROPASSIST Logo" class="w-20 mx-auto mb-3 animate-bounce" />
+      <img src="{{ url_for('static', filename='images/logo.png') }}" alt="AgriTech Logo" class="w-20 mx-auto mb-3 animate-bounce" />
       <h2 class="text-3xl font-bold text-green-800">Welcome Back</h2>
-      <p class="text-sm text-gray-600">Login to access your CROPASSIST tools</p>
+      <p class="text-sm text-gray-600">Login to access your AgriTech tools</p>
     </div><!-- Form -->
     <form id="loginForm" action="/login" method="POST" class="space-y-6">
       <div>

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Soil Fertility Analysis</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        .header {
+            background: linear-gradient(135deg, #43a047, #1b5e20);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .container {
+            max-width: 1200px;
+        }
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 20px;
+            border: none;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        .card-header {
+            background: linear-gradient(135deg, #4caf50, #388e3c);
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+            font-weight: bold;
+        }
+        .btn-primary {
+            background-color: #43a047;
+            border-color: #388e3c;
+        }
+        .btn-primary:hover {
+            background-color: #2e7d32;
+            border-color: #1b5e20;
+        }
+        .nutrient-status {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: inline-block;
+        }
+        .status-low {
+            background-color: #ffebee;
+            color: #d32f2f;
+        }
+        .status-optimal {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        .status-high {
+            background-color: #fff8e1;
+            color: #ff8f00;
+        }
+        .result-box {
+            background-color: #e8f5e9;
+            border-left: 5px solid #43a047;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .recommendation-item {
+            margin-bottom: 10px;
+            border-left: 3px solid #43a047;
+            padding-left: 15px;
+        }
+        .fertilizer-card {
+            border-left: 5px solid #43a047;
+        }
+        .progress-bar {
+            background-color: #43a047;
+        }
+        .form-label {
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="header text-center">
+        <h1><i class="fas fa-seedling me-2"></i>Soil Fertility Analysis</h1>
+        <p class="lead">Get detailed recommendations for optimal fertilizer application based on soil conditions</p>
+    </div>
+
+    <div class="container">
+        {% include 'flash_messages.html' %}
+
+        <!-- Input Form -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3><i class="fas fa-flask me-2"></i>Soil Parameters Input</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('advanced_fertility') }}">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4 class="mb-3">Environmental Factors</h4>
+                            <div class="mb-3">
+                                <label for="temperature" class="form-label">Temperature (°C)</label>
+                                <input type="number" class="form-control" id="temperature" name="temperature" step="0.1" min="0" max="50" required value="30">
+                                <small class="text-muted">Average temperature in degrees Celsius</small>
+                            </div>
+                            <div class="mb-3">
+                                <label for="humidity" class="form-label">Humidity (%)</label>
+                                <input type="number" class="form-control" id="humidity" name="humidity" step="0.1" min="0" max="100" required value="60">
+                                <small class="text-muted">Relative humidity percentage</small>
+                            </div>
+                            <div class="mb-3">
+                                <label for="moisture" class="form-label">Soil Moisture (%)</label>
+                                <input type="number" class="form-control" id="moisture" name="moisture" step="0.1" min="0" max="100" required value="40">
+                                <small class="text-muted">Soil moisture content percentage</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h4 class="mb-3">Soil Nutrients</h4>
+                            <div class="mb-3">
+                                <label for="nitrogen" class="form-label">Nitrogen (N) Content</label>
+                                <input type="number" class="form-control" id="nitrogen" name="nitrogen" step="0.1" min="1" required value="20">
+                                <small class="text-muted">Nitrogen content in kg/ha</small>
+                            </div>
+                            <div class="mb-3">
+                                <label for="phosphorous" class="form-label">Phosphorous (P) Content</label>
+                                <input type="number" class="form-control" id="phosphorous" name="phosphorous" step="0.1" min="1" required value="15">
+                                <small class="text-muted">Phosphorous content in kg/ha</small>
+                            </div>
+                            <div class="mb-3">
+                                <label for="potassium" class="form-label">Potassium (K) Content</label>
+                                <input type="number" class="form-control" id="potassium" name="potassium" step="0.1" min="1" required value="10">
+                                <small class="text-muted">Potassium content in kg/ha</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="soil_type" class="form-label">Soil Type</label>
+                                <select class="form-select" id="soil_type" name="soil_type" required>
+                                    {% for soil_type in soil_types %}
+                                    <option value="{{ soil_type }}">{{ soil_type }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="crop_type" class="form-label">Crop Type</label>
+                                <select class="form-select" id="crop_type" name="crop_type" required>
+                                    {% for crop_type in crop_types %}
+                                    <option value="{{ crop_type }}">{{ crop_type }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-search me-2"></i>Analyze Soil Fertility
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        {% if result %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3><i class="fas fa-chart-pie me-2"></i>Fertility Analysis Results</h3>
+            </div>
+            <div class="card-body">
+                <!-- Main Fertilizer Recommendation -->
+                <div class="row mb-4">
+                    <div class="col-lg-8">
+                        <div class="result-box">
+                            <h4 class="mb-3">Recommended Fertilizer: <strong>{{ fertilizer }}</strong></h4>
+                            <p>Based on your soil parameters, we recommend using <strong>{{ fertilizer }}</strong> as the optimal fertilizer for your crop.</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="card fertilizer-card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Top Fertilizer Options</h5>
+                                {% for fert in fertilizer_probs %}
+                                <div class="mb-2">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span>{{ fert.name }}</span>
+                                        <span>{{ fert.probability|round(1) }}%</span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar" role="progressbar" style="width: {{ fert.probability }}%" 
+                                            aria-valuenow="{{ fert.probability }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NPK Analysis -->
+                <h4 class="mb-3"><i class="fas fa-flask me-2"></i>Nutrient Analysis</h4>
+                <div class="row">
+                    <!-- Nitrogen Analysis -->
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Nitrogen (N)</h5>
+                                <p>Current level: <strong>{{ nitrogen }} kg/ha</strong></p>
+                                <div class="mb-2">
+                                    <span class="nutrient-status 
+                                        {% if npk_analysis.nitrogen.status == 'Low' %}status-low
+                                        {% elif npk_analysis.nitrogen.status == 'Optimal' %}status-optimal
+                                        {% else %}status-high{% endif %}">
+                                        {{ npk_analysis.nitrogen.status }}
+                                    </span>
+                                </div>                                <p>{{ npk_analysis.nitrogen.recommendation }}</p>
+                                {% if (deficiencies.N is defined and deficiencies.N > 0) or (deficiencies.Nitrogen is defined and deficiencies.Nitrogen > 0) %}
+                                <div class="alert alert-warning mt-2">
+                                    <small><i class="fas fa-exclamation-triangle me-1"></i>Deficiency: {{ (deficiencies.N if deficiencies.N is defined else deficiencies.Nitrogen)|round(2) }} kg/ha required</small>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Phosphorous Analysis -->
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Phosphorous (P)</h5>
+                                <p>Current level: <strong>{{ phosphorous }} kg/ha</strong></p>
+                                <div class="mb-2">
+                                    <span class="nutrient-status 
+                                        {% if npk_analysis.phosphorous.status == 'Low' %}status-low
+                                        {% elif npk_analysis.phosphorous.status == 'Optimal' %}status-optimal
+                                        {% else %}status-high{% endif %}">
+                                        {{ npk_analysis.phosphorous.status }}
+                                    </span>
+                                </div>                                <p>{{ npk_analysis.phosphorous.recommendation }}</p>
+                                {% if (deficiencies.P is defined and deficiencies.P > 0) or (deficiencies.Phosphorous is defined and deficiencies.Phosphorous > 0) %}
+                                <div class="alert alert-warning mt-2">
+                                    <small><i class="fas fa-exclamation-triangle me-1"></i>Deficiency: {{ (deficiencies.P if deficiencies.P is defined else deficiencies.Phosphorous)|round(2) }} kg/ha required</small>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Potassium Analysis -->
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Potassium (K)</h5>
+                                <p>Current level: <strong>{{ potassium }} kg/ha</strong></p>
+                                <div class="mb-2">
+                                    <span class="nutrient-status 
+                                        {% if npk_analysis.potassium.status == 'Low' %}status-low
+                                        {% elif npk_analysis.potassium.status == 'Optimal' %}status-optimal
+                                        {% else %}status-high{% endif %}">
+                                        {{ npk_analysis.potassium.status }}
+                                    </span>
+                                </div>                                <p>{{ npk_analysis.potassium.recommendation }}</p>
+                                {% if (deficiencies.K is defined and deficiencies.K > 0) or (deficiencies.Potassium is defined and deficiencies.Potassium > 0) %}
+                                <div class="alert alert-warning mt-2">
+                                    <small><i class="fas fa-exclamation-triangle me-1"></i>Deficiency: {{ (deficiencies.K if deficiencies.K is defined else deficiencies.Potassium)|round(2) }} kg/ha required</small>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fertilizer Recommendations -->
+                <h4 class="mt-4 mb-3"><i class="fas fa-leaf me-2"></i>Detailed Recommendations</h4>
+                <div class="card">
+                    <div class="card-body">
+                        <ul class="list-unstyled">
+                            {% for recommendation in recommendations %}
+                            <li class="recommendation-item py-2">{{ recommendation }}</li>
+                            {% endfor %}
+                        </ul>
+                        
+                        <div class="alert alert-info mt-3">
+                            <h5><i class="fas fa-info-circle me-2"></i>Additional Information</h5>
+                            <p>The recommendations are based on your current soil nutrient levels and the specific requirements of {{ crop_type }}. For best results, follow the application instructions on the fertilizer packaging and consider seasonal variations.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% elif fertility_result %}
+        <div class="alert alert-danger">
+            {{ fertility_result }}
+        </div>
+        {% endif %}
+        
+        <div class="text-center mb-5">
+            <a href="{{ url_for('home') }}" class="btn btn-secondary">
+                <i class="fas fa-home me-2"></i>Back to Home
+            </a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

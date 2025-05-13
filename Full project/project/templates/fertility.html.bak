@@ -51,7 +51,7 @@
     <div class="container mx-auto flex justify-between items-center px-6">
       <h1 class="text-2xl font-extrabold text-yellow-600 tracking-wide flex items-center gap-2">
         <img src="https://cdn-icons-png.flaticon.com/512/2913/2913461.png" class="w-8 h-8" alt="logo">
-        CropAssist Solution
+        AgriTech Solution
       </h1>
       <a href="{{ url_for('home') }}" class="text-yellow-600 hover:underline hover:text-yellow-700 transition">
         ← Back to Home
@@ -131,7 +131,7 @@
     <div class="flex justify-center mb-2">
       <img src="https://cdn-icons-png.flaticon.com/512/3271/3271319.png" class="w-12 h-12 floating" alt="footer icon">
     </div>
-    &copy; 2025 CropAssist Solution — Empowering Smarter Farming 🌾
+    &copy; 2025 AgriTech Solution — Empowering Smarter Farming 🌾
   </footer>
 
   <script>
