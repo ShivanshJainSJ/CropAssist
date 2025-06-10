@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AgriTech</title>
+  <title>CropAssist</title>
   <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png">
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
     html { scroll-behavior: smooth; }
     @keyframes fadeInUp {
@@ -48,8 +49,8 @@
   <nav class="bg-white shadow py-4 sticky top-0 z-50">
     <div class="container mx-auto flex justify-between items-center px-6">
       <div class="flex items-center space-x-3">
-        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="AgriTech Logo" class="w-12 h-12" />
-        <h1 class="text-2xl font-bold text-green-700">🌾 AgriTech Solution</h1>
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="CropAssist Logo" class="w-12 h-12" />
+        <h1 class="text-2xl font-bold text-green-700">🌾 CropAssist Solution</h1>
       </div>      <ul class="flex gap-6 text-gray-600 font-medium">
         <li><a href="#home" class="hover:text-green-600">Home</a></li>
         <li><a href="#about" class="hover:text-green-600">About</a></li>
@@ -59,13 +60,33 @@
         <li><a href="{{ url_for('disease_history') }}" class="hover:text-green-600">Detection History</a></li>
         {% endif %}
         <li><a href="#feedback" class="hover:text-green-600">Feedback</a></li>
-      </ul>
-      <div class="relative">
-        <button onclick="toggleAccountMenu()" class="text-2xl cursor-pointer hover:text-green-700 focus:outline-none">👤</button>        <div id="accountMenu" class="absolute right-0 mt-2 w-40 bg-white border rounded-lg shadow-lg hidden z-50">
+      </ul>      <div class="relative">
+        <button onclick="toggleAccountMenu()" class="text-2xl cursor-pointer hover:text-green-700 focus:outline-none flex items-center">
+          👤
+          {% if logged_in and user_name %}
+          <span class="ml-2 text-sm font-medium">{{ user_name }}</span>
+          {% endif %}
+        </button>
+        <div id="accountMenu" class="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg hidden z-50">
           <ul class="text-left text-sm text-gray-700">
-            <li><a id="menuLogin" href="/login" class="block px-4 py-2 hover:bg-gray-100">Login</a></li>
-            <li><a id="menuLogout" href="/logout" class="block px-4 py-2 hover:bg-gray-100 hidden">Logout</a></li>
-            <li><a href="#customerCare" class="block px-4 py-2 hover:bg-gray-100">Customer Care</a></li>
+            {% if logged_in %}
+            <li class="px-4 py-2 bg-green-50 border-b">
+              <span class="text-green-700 font-medium">Welcome, {{ user_name }}!</span>
+            </li>
+            <li><a href="/logout" class="block px-4 py-2 hover:bg-gray-100 text-red-600">
+              <i class="fas fa-sign-out-alt mr-2"></i>Logout
+            </a></li>
+            {% else %}
+            <li><a href="/login" class="block px-4 py-2 hover:bg-gray-100 text-green-600">
+              <i class="fas fa-sign-in-alt mr-2"></i>Login
+            </a></li>
+            <li><a href="/register" class="block px-4 py-2 hover:bg-gray-100 text-blue-600">
+              <i class="fas fa-user-plus mr-2"></i>Register
+            </a></li>
+            {% endif %}
+            <li class="border-t"><a href="#customerCare" class="block px-4 py-2 hover:bg-gray-100">
+              <i class="fas fa-headset mr-2"></i>Customer Care
+            </a></li>
           </ul>
         </div>
       </div>
@@ -77,7 +98,7 @@
 
   <!-- Hero Section -->
   <section id="home" class="bg-green-100 py-24 text-center fade-in px-4">
-    <h2 class="text-5xl font-bold text-green-800 mb-4">AgriTech – खेती का स्मार्ट समाधान</h2>
+    <h2 class="text-5xl font-bold text-green-800 mb-4">CropAssist – खेती का स्मार्ट समाधान</h2>
     <p class="text-xl text-green-900 mb-6">Make smarter farming decisions with AI-powered recommendations.</p>
     <div class="text-lg text-gray-700 space-y-2">
       <p><span class="emoji-animated">🌱</span> What crop should you grow?</p>
@@ -91,12 +112,12 @@
   <section id="about" class="container mx-auto py-20 px-6 fade-in">
     <div class="flex flex-col md:flex-row items-center">
       <div class="md:w-1/2 mb-8 md:mb-0">
-        <img src="https://via.placeholder.com/500x300" alt="AgriTech" class="rounded-xl shadow-lg w-full object-cover" />
+        <img src="https://via.placeholder.com/500x300" alt="CropAssist" class="rounded-xl shadow-lg w-full object-cover" />
       </div>
       <div class="md:w-1/2 md:pl-10">
         <h3 class="text-4xl font-semibold text-green-700 mb-6">About Us</h3>
         <p class="text-lg text-gray-700 mb-4">
-          Improving agriculture, improving lives. AgriTech empowers farmers with machine learning tools to choose the right crops, manage nutrients, and detect diseases early.
+          Improving agriculture, improving lives. CropAssist empowers farmers with machine learning tools to choose the right crops, manage nutrients, and detect diseases early.
         </p>
         <p class="text-base text-gray-600">We combine AI and agricultural knowledge to help you grow better, faster, and healthier crops.</p>
       </div>
@@ -168,9 +189,9 @@
     <div class="container mx-auto text-center">
       <h3 class="text-4xl font-semibold text-green-700 mb-6">Customer Care</h3>
       <p class="text-lg text-gray-700 mb-6">Have questions? We're here to help.</p>
-      <p class="text-base text-gray-600 mb-2">🧑‍💻 Created with love by ❤️: Shivansh Jain</p>
-      <p class="text-base text-gray-600 mb-2">📞 Phone: +91-7900921775</p>
-      <p class="text-base text-gray-600 mb-2">📧 Email: sjshivanshjain@gmail.com</p>
+      <p class="text-base text-gray-600 mb-2">🧑‍💻 Created with love by ❤️: Adarsh Jain</p>
+      <p class="text-base text-gray-600 mb-2">📞 Phone: +91-9876543210</p>
+      <p class="text-base text-gray-600 mb-2">📧 Email: info@cropassist.in</p>
       <p class="text-base text-gray-600">🕒 Available: Mon–Fri, 9:00 AM – 6:00 PM</p>
     </div>
   </section>
@@ -189,7 +210,7 @@
 
   <!-- Footer -->
   <footer class="bg-green-700 text-white text-center p-4">
-    &copy; 2025 AgriTech Solution. All rights reserved.
+    &copy; 2025 CropAssist Solution. All rights reserved.
   </footer>
 <script>
   
@@ -207,27 +228,12 @@ window.addEventListener("load", function () {
     document.getElementById("languageModal").classList.remove("hidden");
   }
 });
-
   let isLoggedIn = {{ 'true' if logged_in else 'false' }};
   let userName = "{% if user_name %}{{ user_name }}{% else %}User{% endif %}";
   
-  // Update UI based on login status
-  function updateLoginUI() {
-    const loginLink = document.getElementById('menuLogin');
-    const logoutLink = document.getElementById('menuLogout');
-    
-    if (isLoggedIn) {
-      loginLink.classList.add('hidden');
-      logoutLink.classList.remove('hidden');
-    } else {
-      loginLink.classList.remove('hidden');
-      logoutLink.classList.add('hidden');
-    }
-  }
-  
   // Call this when the page loads
   document.addEventListener('DOMContentLoaded', function() {
-    updateLoginUI();
+    // Page is ready
   });
 
   function requireLogin(event, url) {
@@ -246,21 +252,8 @@ window.addEventListener("load", function () {
   function closeModal() {
     document.getElementById('loginModal').classList.add('hidden');
   }
-
   function toggleAccountMenu() {
     document.getElementById('accountMenu').classList.toggle('hidden');
-    updateAccountMenu();
-  }
-  function updateAccountMenu() {
-    const loginItem = document.getElementById('menuLogin');
-    const logoutItem = document.getElementById('menuLogout');
-    if (isLoggedIn) {
-      loginItem.classList.add('hidden');
-      logoutItem.classList.remove('hidden');
-    } else {
-      loginItem.classList.remove('hidden');
-      logoutItem.classList.add('hidden');
-    }
   }
 
   function showThanks(event) {
@@ -284,9 +277,8 @@ window.addEventListener("load", function () {
 </script>
 <script>
   const translations = {
-    english: {
-      title: "AgriTech Solution",
-      heroTitle: "AgriTech – Smart Solutions for Farming",
+    english: {      title: "CropAssist Solution",
+      heroTitle: "CropAssist – Smart Solutions for Farming",
       heroSubtitle: "Make smarter farming decisions with AI-powered recommendations.",
       cropQuestion: "🌱 What crop should you grow?",
       fertQuestion: "🧪 What fertilizer should you use?",

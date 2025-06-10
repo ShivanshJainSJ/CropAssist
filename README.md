@@ -1,4 +1,4 @@
-# CropAssist Solution - Agritech Full Stack Project
+# CropAssist Solution - CropAssist Full Stack Project
 
 ![CropAssist Logo](https://cdn-icons-png.flaticon.com/512/2913/2913461.png)
 

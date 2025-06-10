@@ -5,8 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Fertility Analysis - CROPASSIST</title>
   <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
+  <script src="https://cdn.tailwindcss.com"></script>  <style>
     @keyframes fadeInUp {
       0% { opacity: 0; transform: translateY(20px); }
       100% { opacity: 1; transform: translateY(0); }
@@ -26,6 +25,52 @@
     }
     .input-focus:focus {
       border-color: #ffc107;
+    }
+    
+    /* Input validation styles */
+    .input-group {
+      position: relative;
+      margin-bottom: 1.5rem;
+    }
+    
+    .validation-warning {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      border: 1px solid #f59e0b;
+      border-radius: 0.5rem;
+      padding: 0.5rem;
+      font-size: 0.75rem;
+      color: #92400e;
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: all 0.3s ease;
+      z-index: 10;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      margin-top: 0.25rem;
+    }
+    
+    .validation-warning.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .input-invalid {
+      border-color: #ef4444 !important;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+    }
+    
+    .input-valid {
+      border-color: #10b981 !important;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
+    }
+    
+    .range-hint {
+      font-size: 0.75rem;
+      color: #6b7280;
+      margin-top: 0.25rem;
     }
   </style>
 </head>
@@ -57,24 +102,32 @@
               </div>
             {% endif %}
             {% endwith %}
-            
-            <form action="/fertility" method="POST" class="space-y-6">
-              <div>
-                <label class="block text-lg font-semibold text-gray-800">🌾 Nitrogen</label>
-                <input type="number" name="nitrogen" placeholder="e.g. 50" min="1" required
-                       class="w-full mt-2 p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-yellow-400 focus:outline-none transition input-focus"/>
+              <form action="/fertility" method="POST" class="space-y-6">
+              <div class="input-group">
+                <label class="block text-lg font-semibold text-gray-800">🌾 Nitrogen (mg/kg)</label>
+                <input type="number" name="nitrogen" placeholder="e.g. 50" min="0" max="150" step="0.1" required
+                       class="w-full mt-2 p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-yellow-400 focus:outline-none transition input-focus"
+                       oninput="validateInput(this, 0, 150, 'Nitrogen')"/>
+                <div class="range-hint">Recommended range: 0-150 mg/kg</div>
+                <div class="validation-warning" id="nitrogen-warning"></div>
               </div>
               
-              <div>
-                <label class="block text-lg font-semibold text-gray-800">🌱 Phosphorous</label>
-                <input type="number" name="phosphorous" placeholder="e.g. 30" min="1" required
-                       class="w-full mt-2 p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-yellow-400 focus:outline-none transition input-focus"/>
+              <div class="input-group">
+                <label class="block text-lg font-semibold text-gray-800">🌱 Phosphorous (mg/kg)</label>
+                <input type="number" name="phosphorous" placeholder="e.g. 30" min="5" max="150" step="0.1" required
+                       class="w-full mt-2 p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-yellow-400 focus:outline-none transition input-focus"
+                       oninput="validateInput(this, 5, 150, 'Phosphorous')"/>
+                <div class="range-hint">Recommended range: 5-150 mg/kg</div>
+                <div class="validation-warning" id="phosphorous-warning"></div>
               </div>
               
-              <div>
-                <label class="block text-lg font-semibold text-gray-800">🍃 Potassium</label>
-                <input type="number" name="pottasium" placeholder="e.g. 40" min="1" required
-                       class="w-full mt-2 p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-yellow-400 focus:outline-none transition input-focus"/>
+              <div class="input-group">
+                <label class="block text-lg font-semibold text-gray-800">🍃 Potassium (mg/kg)</label>
+                <input type="number" name="pottasium" placeholder="e.g. 40" min="5" max="250" step="0.1" required
+                       class="w-full mt-2 p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-yellow-400 focus:outline-none transition input-focus"
+                       oninput="validateInput(this, 5, 250, 'Potassium')"/>
+                <div class="range-hint">Recommended range: 5-250 mg/kg</div>
+                <div class="validation-warning" id="pottasium-warning"></div>
               </div>
               
               <button type="submit" class="w-full py-3 bg-yellow-500 hover:bg-yellow-600 text-white font-bold rounded-xl transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 glow">
@@ -147,11 +200,69 @@
         </div>
       </div>
     </div>
-    
-    <!-- Footer -->
+      <!-- Footer -->
     <footer class="mt-16 text-center text-gray-600">
       <p>&copy; 2025 CROPASSIST. All rights reserved.</p>
     </footer>
   </div>
+  
+  <script>
+    function validateInput(input, min, max, fieldName) {
+      const value = parseFloat(input.value);
+      const warningElement = document.getElementById(input.name + '-warning');
+      
+      // Remove existing classes
+      input.classList.remove('input-invalid', 'input-valid');
+      warningElement.classList.remove('show');
+      
+      if (input.value === '') {
+        return; // Don't validate empty inputs
+      }
+      
+      if (isNaN(value)) {
+        showWarning(input, warningElement, `${fieldName} must be a valid number.`);
+        return;
+      }
+      
+      if (value < min) {
+        showWarning(input, warningElement, 
+          `⚠️ ${fieldName} is too low! Minimum value is ${min}. Current: ${value}`);
+      } else if (value > max) {
+        showWarning(input, warningElement, 
+          `⚠️ ${fieldName} is too high! Maximum value is ${max}. Current: ${value}`);
+      } else {
+        // Valid input
+        input.classList.add('input-valid');
+        hideWarning(warningElement);
+      }
+    }
+    
+    function showWarning(input, warningElement, message) {
+      input.classList.add('input-invalid');
+      warningElement.textContent = message;
+      warningElement.classList.add('show');
+    }
+    
+    function hideWarning(warningElement) {
+      warningElement.classList.remove('show');
+    }
+    
+    // Add form submission validation
+    document.querySelector('form').addEventListener('submit', function(e) {
+      const inputs = this.querySelectorAll('input[type="number"]');
+      let hasErrors = false;
+      
+      inputs.forEach(input => {
+        if (input.classList.contains('input-invalid')) {
+          hasErrors = true;
+        }
+      });
+      
+      if (hasErrors) {
+        e.preventDefault();
+        alert('Please fix all validation errors before submitting the form.');
+      }
+    });
+  </script>
 </body>
 </html>

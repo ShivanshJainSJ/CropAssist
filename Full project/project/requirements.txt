@@ -5,6 +5,11 @@ Flask==2.0.1
 pymongo==4.3.3
 dnspython==2.3.0  # For MongoDB connection string support
 
+# Email functionality
+smtplib # Built-in Python library for email sending
+email # Built-in Python library for email formatting
+python-dotenv==1.0.0  # For environment variables management (moved up for email config)
+
 # Data processing and scientific computing
 numpy==1.24.3
 pandas==2.0.1
@@ -14,6 +19,8 @@ scipy==1.10.1
 tensorflow==2.12.0
 tensorflow-hub==0.13.0  # For accessing pre-trained models
 efficientnet==1.1.1  # EfficientNet models for TensorFlow
+torch==2.0.1  # PyTorch for plant disease model
+torchvision==0.15.2  # For PyTorch vision utilities
 Pillow==9.5.0  # For PIL/Image processing
 scikit-learn==1.2.2  # For additional ML utilities
 opencv-python==4.7.0.72  # For image processing and quality assessment
@@ -25,5 +32,4 @@ keras-applications==1.0.8  # Keras pre-built applications
 keras-preprocessing==1.1.2  # Image preprocessing utilities
 
 # Other utilities
-python-dotenv==1.0.0  # For environment variables management
 gunicorn==20.1.0  # For production deployment

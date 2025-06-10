@@ -3,10 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>🌾 Crop Recommendation | AgriTech</title>
+  <title>🌾 Crop Recommendation | CropAssist</title>
   <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
+  <script src="https://cdn.tailwindcss.com"></script>  <style>
     body {
       animation: fadeIn 1s ease-in;
     }
@@ -27,6 +26,50 @@
       box-shadow: 0 8px 30px rgba(34, 197, 94, 0.5);
       transform: translateY(-2px);
     }
+    
+    /* Input validation styles */
+    .input-group {
+      position: relative;
+    }
+    
+    .validation-warning {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      border: 1px solid #f59e0b;
+      border-radius: 0.5rem;
+      padding: 0.5rem;
+      font-size: 0.75rem;
+      color: #92400e;
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: all 0.3s ease;
+      z-index: 10;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .validation-warning.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .input-invalid {
+      border-color: #ef4444 !important;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+    }
+    
+    .input-valid {
+      border-color: #10b981 !important;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
+    }
+    
+    .range-hint {
+      font-size: 0.75rem;
+      color: #6b7280;
+      margin-top: 0.25rem;
+    }
   </style>
 </head>
 <body class="bg-gradient-to-br from-green-200 via-green-50 to-green-100 min-h-screen font-sans text-gray-800">
@@ -34,7 +77,7 @@
   <!-- Navbar -->
   <nav class="bg-white/80 shadow-md py-4 sticky top-0 backdrop-blur-md z-10">
     <div class="container mx-auto flex justify-between items-center px-4">
-      <h1 class="text-2xl font-bold text-green-800">🌿 AgriTech Solution</h1>
+      <h1 class="text-2xl font-bold text-green-800">🌿 CropAssist Solution</h1>
       <a href="{{ url_for('home') }}" class="text-green-700 hover:underline text-sm font-medium">← Back to Home</a>
     </div>
   </nav>
@@ -46,56 +89,75 @@
       <h2 class="text-4xl font-extrabold text-center text-green-800 mb-4 animate-pulse">🌾 Recommend Your Crop</h2>
       <p class="text-center text-gray-600 text-lg mb-8">
         Let us suggest the best crop based on your soil's nutrients and your local climate conditions.
-      </p>
-
-      <form method="POST" action="{{ url_for('predict_crop_route') }}" class="space-y-6">
+      </p>      <form method="POST" action="{{ url_for('predict_crop_route') }}" class="space-y-6">
         <!-- Nitrogen -->
-        <div>
-          <label class="block text-md font-medium text-gray-700">🧪 Nitrogen</label>
-          <input type="number" name="nitrogen" placeholder="e.g. 50"
-                 class="w-full mt-2 p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 bg-white/90 shadow-sm" required>
+        <div class="input-group">
+          <label class="block text-md font-medium text-gray-700">🧪 Nitrogen (mg/kg)</label>
+          <input type="number" name="nitrogen" placeholder="e.g. 50" min="0" max="150" step="0.1"
+                 class="w-full mt-2 p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 bg-white/90 shadow-sm" 
+                 required oninput="validateInput(this, 0, 150, 'Nitrogen')">
+          <div class="range-hint">Recommended range: 0-150 mg/kg</div>
+          <div class="validation-warning" id="nitrogen-warning"></div>
         </div>
 
         <!-- Phosphorous -->
-        <div>
-          <label class="block text-md font-medium text-gray-700">🧪 Phosphorous</label>
-          <input type="number" name="phosphorous" placeholder="e.g. 40"
-                 class="w-full mt-2 p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 bg-white/90 shadow-sm" required>
+        <div class="input-group">
+          <label class="block text-md font-medium text-gray-700">🧪 Phosphorous (mg/kg)</label>
+          <input type="number" name="phosphorous" placeholder="e.g. 40" min="5" max="150" step="0.1"
+                 class="w-full mt-2 p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 bg-white/90 shadow-sm" 
+                 required oninput="validateInput(this, 5, 150, 'Phosphorous')">
+          <div class="range-hint">Recommended range: 5-150 mg/kg</div>
+          <div class="validation-warning" id="phosphorous-warning"></div>
         </div>
 
         <!-- Potassium -->
-        <div>
-          <label class="block text-md font-medium text-gray-700">🧪 Potassium</label>
-          <input type="number" name="pottasium" placeholder="e.g. 35"
-                 class="w-full mt-2 p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 bg-white/90 shadow-sm" required>
+        <div class="input-group">
+          <label class="block text-md font-medium text-gray-700">🧪 Potassium (mg/kg)</label>
+          <input type="number" name="potassium" placeholder="e.g. 35" min="5" max="250" step="0.1"
+                 class="w-full mt-2 p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 bg-white/90 shadow-sm" 
+                 required oninput="validateInput(this, 5, 250, 'Potassium')">
+          <div class="range-hint">Recommended range: 5-250 mg/kg</div>
+          <div class="validation-warning" id="potassium-warning"></div>
         </div>
 
         <!-- pH Level -->
-        <div>
+        <div class="input-group">
           <label class="block text-md font-medium text-gray-700">🌡️ pH Level</label>
-          <input type="number" step="0.01" name="ph" placeholder="e.g. 6.5"
-                 class="w-full mt-2 p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 bg-white/90 shadow-sm" required>
+          <input type="number" step="0.01" name="ph" placeholder="e.g. 6.5" min="3.5" max="9.5"
+                 class="w-full mt-2 p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 bg-white/90 shadow-sm" 
+                 required oninput="validateInput(this, 3.5, 9.5, 'pH')">
+          <div class="range-hint">Recommended range: 3.5-9.5 (neutral: 6.0-7.5)</div>
+          <div class="validation-warning" id="ph-warning"></div>
         </div>
 
         <!-- Rainfall -->
-        <div>
-          <label class="block text-md font-medium text-gray-700">🌧️ Rainfall (mm)</label>
-          <input type="number" step="0.01" name="rainfall" placeholder="e.g. 200.00"
-                 class="w-full mt-2 p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 bg-white/90 shadow-sm" required>
+        <div class="input-group">
+          <label class="block text-md font-medium text-gray-700">🌧️ Rainfall (mm/year)</label>
+          <input type="number" step="0.01" name="rainfall" placeholder="e.g. 200.00" min="20" max="3000"
+                 class="w-full mt-2 p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 bg-white/90 shadow-sm" 
+                 required oninput="validateInput(this, 20, 3000, 'Rainfall')">
+          <div class="range-hint">Recommended range: 20-3000 mm/year</div>
+          <div class="validation-warning" id="rainfall-warning"></div>
         </div>
 
         <!-- Temperature -->
-        <div>
+        <div class="input-group">
           <label class="block text-md font-medium text-gray-700">🌡️ Temperature (°C)</label>
-          <input type="number" step="0.01" name="temperature" placeholder="e.g. 25.5"
-                 class="w-full mt-2 p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 bg-white/90 shadow-sm" required>
+          <input type="number" step="0.01" name="temperature" placeholder="e.g. 25.5" min="8" max="50"
+                 class="w-full mt-2 p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 bg-white/90 shadow-sm" 
+                 required oninput="validateInput(this, 8, 50, 'Temperature')">
+          <div class="range-hint">Recommended range: 8-50°C (optimal: 20-30°C)</div>
+          <div class="validation-warning" id="temperature-warning"></div>
         </div>
 
         <!-- Humidity -->
-        <div>
+        <div class="input-group">
           <label class="block text-md font-medium text-gray-700">💧 Humidity (%)</label>
-          <input type="number" step="0.01" name="humidity" placeholder="e.g. 80.5"
-                 class="w-full mt-2 p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 bg-white/90 shadow-sm" required>
+          <input type="number" step="0.01" name="humidity" placeholder="e.g. 80.5" min="14" max="100"
+                 class="w-full mt-2 p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 bg-white/90 shadow-sm" 
+                 required oninput="validateInput(this, 14, 100, 'Humidity')">
+          <div class="range-hint">Recommended range: 14-100% (optimal: 40-80%)</div>
+          <div class="validation-warning" id="humidity-warning"></div>
         </div>
 
         <!-- State and City -->
@@ -158,9 +220,67 @@
         ✅ Suggested Crop: <span class="text-green-900">{{ crop_result }}</span>
       </div>
       {% endif %}
-    </div>
-  </section>
+    </div>  </section>
 
   <script src="{{ url_for('static', filename='js/states-and-cities.js') }}"></script>
+  
+  <script>
+    function validateInput(input, min, max, fieldName) {
+      const value = parseFloat(input.value);
+      const warningElement = document.getElementById(input.name + '-warning');
+      
+      // Remove existing classes
+      input.classList.remove('input-invalid', 'input-valid');
+      warningElement.classList.remove('show');
+      
+      if (input.value === '') {
+        return; // Don't validate empty inputs
+      }
+      
+      if (isNaN(value)) {
+        showWarning(input, warningElement, `${fieldName} must be a valid number.`);
+        return;
+      }
+      
+      if (value < min) {
+        showWarning(input, warningElement, 
+          `⚠️ ${fieldName} is too low! Minimum value is ${min}. Current: ${value}`);
+      } else if (value > max) {
+        showWarning(input, warningElement, 
+          `⚠️ ${fieldName} is too high! Maximum value is ${max}. Current: ${value}`);
+      } else {
+        // Valid input
+        input.classList.add('input-valid');
+        hideWarning(warningElement);
+      }
+    }
+    
+    function showWarning(input, warningElement, message) {
+      input.classList.add('input-invalid');
+      warningElement.textContent = message;
+      warningElement.classList.add('show');
+    }
+    
+    function hideWarning(warningElement) {
+      warningElement.classList.remove('show');
+    }
+    
+    // Add form submission validation
+    document.querySelector('form').addEventListener('submit', function(e) {
+      const inputs = this.querySelectorAll('input[type="number"]');
+      let hasErrors = false;
+      
+      inputs.forEach(input => {
+        if (input.classList.contains('input-invalid')) {
+          hasErrors = true;
+        }
+      });
+      
+      if (hasErrors) {
+        e.preventDefault();
+        alert('Please fix all validation errors before submitting the form.');
+      }
+    });
+  </script>
 </body>
 </html>

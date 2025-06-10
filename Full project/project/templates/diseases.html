@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Disease Detection - AgriTech</title>
+  <title>Disease Detection - CropAssist</title>
   <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png">
   <script src="https://cdn.tailwindcss.com"></script>  <style>
     /* Custom animation for button hover */
@@ -47,6 +47,61 @@
     .confidence-bar.medium {
       background: linear-gradient(90deg, #fbbf24, #f59e0b, #d97706);
     }
+    
+    /* Treatment recommendation styling */
+    .treatment-recommendation {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    
+    .treatment-recommendation .disease-header {
+      border-left: 4px solid #059669;
+    }
+    
+    .treatment-section {
+      border-radius: 6px;
+      transition: all 0.2s ease;
+    }
+    
+    .treatment-section:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .treatment-section h5 svg {
+      transition: transform 0.2s ease;
+    }
+    
+    .treatment-section:hover h5 svg {
+      transform: scale(1.1);
+    }
+    
+    .treatment-section ul li {
+      margin-bottom: 4px;
+      line-height: 1.5;
+    }
+    
+    .treatment-section ul li:before {
+      content: "→";
+      color: #6b7280;
+      margin-right: 8px;
+      font-weight: bold;
+    }
+    
+    .treatment-content {
+      max-height: none;
+      line-height: 1.6;
+    }
+    
+    /* Responsive treatment layout */
+    @media (max-width: 768px) {
+      .treatment-recommendation {
+        font-size: 0.9rem;
+      }
+      
+      .treatment-section h5 {
+        font-size: 1rem;
+      }
+    }
   </style>
 </head>
 
@@ -56,7 +111,7 @@
     <div class="container mx-auto flex justify-between items-center px-4">
       <div class="flex items-center space-x-3">
         <img src="https://cdn-icons-png.flaticon.com/512/2913/2913461.png" alt="logo" class="w-12 h-12" />
-        <h1 class="text-3xl font-bold text-red-700">AgriTech Solution</h1>
+        <h1 class="text-3xl font-bold text-red-700">CropAssist Solution</h1>
       </div>
       <div class="flex space-x-4">
         <a href="{{ url_for('disease_history') }}" class="text-green-700 hover:underline text-sm font-medium">View Detection History</a>
@@ -112,12 +167,11 @@
       <a href="{{ url_for('diseases') }}" class="inline-block bg-amber-600 text-white px-6 py-2 rounded hover:bg-amber-700 transition duration-300">
         Try Again
       </a>
-    </div>
-    {% elif prediction_result %}<!-- Prediction Results -->
+    </div>    {% elif prediction_result %}<!-- Prediction Results -->
     <div class="max-w-3xl mx-auto bg-gray-50 p-8 rounded-xl shadow-lg mb-10">
       <div class="flex flex-col md:flex-row">
         <div class="md:w-1/2 mb-6 md:mb-0 md:pr-4">
-          <img src="data:image/jpeg;base64,{{ image }}" alt="Uploaded plant image" class="rounded-lg shadow-md w-full h-auto">
+          <img src="data:image/jpeg;base64,{{ image }}" alt="Uploaded image" class="rounded-lg shadow-md w-full h-auto">
           
           {% if was_upscaled %}
             <div class="mt-2 text-xs text-gray-500">
@@ -138,19 +192,39 @@
           {% endif %}
           
           <!-- Low confidence warning -->
-          {% if low_confidence %}
+          {% if low_confidence and not not_a_plant %}
             <div class="mt-4 p-3 bg-amber-100 border border-amber-300 text-amber-800 rounded-lg text-sm">
               <p class="font-bold">⚠️ {{ confidence_message }}</p>
               {% if secondary_message %}
-                <p class="mt-1 text-xs">{{ secondary_message }}</p>
+                <p class="mt-1 text-xs">{{ secondary_message|safe }}</p>
               {% endif %}
             </div>
           {% endif %}
         </div>
         <div class="md:w-1/2 text-left md:pl-4">
-          <h3 class="text-2xl font-bold mb-2 {% if 'healthy' in disease %}text-green-700{% else %}text-red-700{% endif %}">
-            {{ disease.replace('___', ' - ').replace('_', ' ') }}
-          </h3>
+          {% if not_a_plant %}
+            <!-- Not a plant error message -->
+            <h3 class="text-2xl font-bold mb-4 text-red-700">
+              Not a Plant Detected
+            </h3>
+            <div class="p-4 bg-red-50 border border-red-200 text-red-800 rounded-lg">
+              <p>{{ error_message }}</p>
+            </div>
+            <div class="mt-6 p-4 bg-blue-50 border border-blue-200 text-blue-800 rounded-lg">
+              <h4 class="font-semibold mb-2">Supported Plants:</h4>
+              <ul class="list-disc pl-5 text-sm space-y-1">
+                <li>Apple</li>
+                <li>Corn (Maize)</li>
+                <li>Grape</li>
+                <li>Potato</li>
+                <li>Tomato</li>
+              </ul>
+            </div>
+          {% else %}
+            <h3 class="text-2xl font-bold mb-2 {% if 'healthy' in disease %}text-green-700{% else %}text-red-700{% endif %}">
+              {{ disease.replace('___', ' - ').replace('_', ' ') }}
+            </h3>
+          {% endif %}
           
           <!-- Confidence Bar -->
           <div class="mb-4">
@@ -187,12 +261,13 @@
               </ul>
             </div>
           {% endif %}
-          
-          <!-- Treatment Recommendations -->
+            <!-- Treatment Recommendations -->
+          {% if not not_a_plant %}
           <div class="bg-gray-100 p-4 rounded-lg mt-4">
             <h4 class="font-bold text-gray-800 mb-2">Treatment Recommendation:</h4>
             <div class="text-gray-700 treatment-content">{{ treatment|safe }}</div>
           </div>
+          {% endif %}
         </div>
       </div>
       <div class="mt-6">
@@ -230,7 +305,7 @@
 
   <!-- Footer -->
   <footer class="bg-gray-800 text-white text-center py-6 mt-10">
-    <p class="text-lg">&copy; 2025 AgriTech Solution. All rights reserved.</p>
+    <p class="text-lg">&copy; 2025 CropAssist Solution. All rights reserved.</p>
   </footer>
   <script>
     // Add flash messages auto-hide functionality

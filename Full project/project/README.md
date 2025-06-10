@@ -1,49 +1,48 @@
-# AgriTech Solution - Agritech Full Stack Project
-
-![AgriTech Logo](https://cdn-icons-png.flaticon.com/512/2913/2913461.png)
+# Plant Disease Detection & Soil Fertility System
 
 ## 📋 Project Overview
 
-AgriTech Solution is a comprehensive agricultural technology platform designed to assist farmers in making data-driven decisions to optimize their farming practices. The application leverages machine learning algorithms to provide personalized recommendations for crop selection, soil fertility analysis, and plant disease detection.
+This is a comprehensive agricultural technology platform that assists farmers with plant disease detection and soil fertility analysis. The system uses machine learning to provide accurate disease identification and fertilizer recommendations.
 
 ## ✨ Features
 
-### 🌾 Crop Recommendation System
-- Suggests optimal crops based on soil nutrient levels (N, P, K)
-- Considers environmental factors like temperature, humidity, pH, and rainfall
-- Location-specific recommendations for different states and cities in India
-
 ### 🔍 Plant Disease Detection
 - Upload images of plant leaves to identify diseases
-- Utilizes a deep learning model (MobileNetV2) for accurate disease classification
-- Maintains history of previous disease detections for tracking
+- Utilizes EfficientNetB0 deep learning model for accurate disease classification
+- Supports 39 different plant disease categories
+- Maintains history of previous disease detections
 
 ### 💧 Soil Fertility Analysis
 - Analyzes soil composition and recommends appropriate fertilizers
-- Optimizes nutrient ratios for specific crops
+- Optimizes nutrient ratios (N, P, K) for specific crops
 - Provides cost-effective fertilizer recommendations
+- Temperature and humidity-based adjustments
 
-### 👤 User Authentication System
-- Secure login and registration
-- Personalized recommendations based on user history
-- Save and track historical data
+### 📧 Email Notification System
+- **Welcome Emails**: Professional welcome messages for new user registrations
+- **Login Notifications**: Security alerts for login activities  
+- **Responsive Design**: Mobile-friendly HTML email templates
+- **Multi-Provider Support**: Works with Gmail, Outlook, Yahoo, and custom SMTP servers
+- **Secure Configuration**: Environment variable-based setup with app password support
 
-### 🌐 Multilingual Support
-- Available in English and Hindi
-- Enhances accessibility for farmers across India
+### 🎯 Input Validation System
+- **Real-time Validation**: Instant feedback for form inputs
+- **Agricultural Ranges**: Scientifically accurate min/max values for all parameters
+- **Visual Feedback**: Color-coded input borders and warning messages
+- **Comprehensive Coverage**: Validates crop recommendation, fertility analysis, and advanced forms
 
 ## 🛠️ Technology Stack
 
 ### Backend
 - Flask (Python web framework)
-- TensorFlow/Keras (ML models)
-- MongoDB (Database)
+- TensorFlow/Keras (Deep learning models)
+- SQLite (Database)
 - NumPy, Pandas, SciPy (Data processing)
+- PIL (Image processing)
 
 ### Frontend
-- HTML, Tailwind CSS
-- JavaScript
-- Responsive design for mobile and desktop
+- HTML, CSS, JavaScript
+- Bootstrap for responsive design
 
 ## 📦 Installation & Setup
 
@@ -55,9 +54,8 @@ AgriTech Solution is a comprehensive agricultural technology platform designed t
 ### Setup Instructions
 
 1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yourusername/AgriTech-solution.git
-   cd AgriTech-solution
+   ```bash   git clone https://github.com/yourusername/CropAssist-solution.git
+   cd CropAssist-solution
    ```
 
 2. **Create and activate virtual environment (optional but recommended)**
@@ -78,17 +76,39 @@ AgriTech Solution is a comprehensive agricultural technology platform designed t
    - Make sure MongoDB is running on your system
    - The application will connect to MongoDB at `mongodb://localhost:27017/`
 
-5. **Initialize the database**
+5. **Set up Email Notifications (Optional)**
+   ```bash
+   # Copy the email configuration template
+   copy .env.template .env
+   
+   # Edit .env file with your email credentials
+   # For Gmail (recommended):
+   EMAIL_ADDRESS=your-email@gmail.com
+   EMAIL_PASSWORD=your-16-character-app-password
+   ```
+   
+   **Gmail Setup Instructions:**
+   - Enable 2-Factor Authentication on your Gmail account
+   - Go to Google Account → Security → 2-Step Verification → App passwords
+   - Generate a new app password for "Mail"
+   - Use the 16-character password in your .env file
+   
+   **Test Email Configuration:**
+   ```bash
+   python verify_email.py
+   ```
+
+6. **Initialize the database**
    ```bash
    python setup_db.py
    ```
 
-6. **Run the application**
+7. **Run the application**
    ```bash
    python app.py
    ```
 
-7. **Access the application**
+8. **Access the application**
    - Open your browser and navigate to `http://127.0.0.1:5000/`
 
 ## 📊 Machine Learning Models
