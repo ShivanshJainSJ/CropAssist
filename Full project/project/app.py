@@ -19,9 +19,6 @@ from functools import wraps
 import warnings
 import logging
 
-# Email notification imports
-from email_config import send_welcome_email, send_login_notification
-
 # Model improvements imports removed - not currently used
 
 # Suppress TensorFlow warnings
