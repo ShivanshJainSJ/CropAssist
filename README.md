@@ -5,7 +5,7 @@
 ## 📋 Project Overview
 
 CropAssist Solution is a comprehensive agricultural technology platform designed to assist farmers in making data-driven decisions to optimize their farming practices. The application leverages machine learning algorithms to provide personalized recommendations for crop selection, soil fertility analysis, and plant disease detection.
-
+with great collaboration with my friend @Aagam-JainAJ
 ## ✨ Features
 
 ### 🌾 Crop Recommendation System
@@ -133,13 +133,10 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## 📜 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## 📞 Contact
 
-For any questions or suggestions, please reach out to us at [your-email@example.com](mailto:your-email@example.com).
+For any questions or suggestions, please reach out to us at [sjshivanshjain@gmail.com](mailto:sjshivanshjain@gmail.com).
 
 ---
 
