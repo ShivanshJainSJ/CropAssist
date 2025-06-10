@@ -365,7 +365,8 @@ def login():
                 
                 if user and user['password'] == password:  # In production, use password hashing!
                     # Store user info in session
-                    session['user_id'] = str(user['_id'])                    session['email'] = user['email']
+                    session['user_id'] = str(user['_id'])                    
+                    session['email'] = user['email']
                     session['name'] = user.get('name', 'User')
                     
                     # Send login notification email
